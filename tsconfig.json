@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./tscBuild",
+    // "target": "esnext",
+    // "module": "esnext",
+    "module": "CommonJS",
+    "target": "es2022",
+    "moduleResolution": "node",
+    "jsx": "preserve",
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "lib": ["es2022", "esnext", "dom"]
+  },
+  "ts-node": {
+    "esm": true
+  },
+  "include": [
+    "src/koa/**/*.ts",
+    "src/renderer/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "src/**/*.jpg",
+    "./auto-imports.d.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}
