@@ -5,6 +5,13 @@ import ReadSteps from './ReadSteps.vue'
 import RequestSteps from './RequestSteps.vue'
 
 const props = defineProps({
+  disabled: {
+    type: Boolean,
+    require: true,
+    default() {
+      return false
+    }
+  },
   mainList: {
     type: Array<resParams>,
     require: true,
@@ -54,20 +61,6 @@ watch(
     }
   }
 )
-// const deepCopy = <T extends Object>(data: T): T => {
-//   if (!data) return data
-//   if (!(data instanceof Object)) return data
-//   const res: any = {}
-//   const keys = Object.keys(data)
-//   keys.forEach((key) => {
-//     const currentValue = data[key]
-//     if (currentValue instanceof Array) {
-//       res[key] = [...currentValue]
-//     }
-//     res[key] = deepCopy(currentValue)
-//   })
-//   return res
-// }
 
 const useTemplate = () => {
   currentSteps.value = []
@@ -194,6 +187,7 @@ const handleEditTask = async () => {
   const toRawList = toRaw(props.mainList)
   toRawList[props.editKey].taskList = toRawStep
   await window.mainApi.setStore('task', [...toRawList])
+  emits('complete', true)
   dialog.value = false
   currentSteps.value = []
   setTimeout(() => {
@@ -209,6 +203,7 @@ const handleEditTask = async () => {
         color="primary"
         icon="mdi-plus"
         v-bind="wrapperProps"
+        :disabled="props.disabled"
         style="position: fixed; right: 1em; bottom: 1em; z-index: 1"
       ></v-btn>
     </template>

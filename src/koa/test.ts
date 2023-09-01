@@ -1,19 +1,17 @@
-import { server as ModbusServer } from 'jsmodbus'
-import net from 'net'
-
 // 调试函数
 const test = async () => {
-  const netServer = new net.Server()
-  // eslint-disable-next-line no-unused-vars
-  const server = new ModbusServer.TCP(netServer)
-  netServer.listen(8888)
-
-  // netServer.close()
+  const person = { name: '111' }
+  const fn = (value) => {
+    value.name = '2222222'
+  }
+  console.log(person)
+  fn(person)
+  console.log(person)
 }
 
 ;(async () => {
   console.log('start test')
   await test()
-  console.log('start end')
+  console.log('end')
   process.exit()
 })()

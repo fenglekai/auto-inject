@@ -66,9 +66,8 @@ export const createWebSocket = async (httpServer: any) => {
       if (tag === 'watch') {
         clearInterval(taskTimer)
         taskTimer = setInterval(async () => {
-          currentTaskList = await useStoreGet('task')
           socket.emit('task', currentTaskList)
-        }, 1000)
+        }, 200)
       }
     })
 
@@ -76,10 +75,9 @@ export const createWebSocket = async (httpServer: any) => {
       for (let i = 0; i < currentTaskList.length; i++) {
         const task = currentTaskList[i]
         if (taskName === task.taskName && !task.taskStatus) {
-          setTimeout(async () => {
-            callback()
-            await taskProcessList[taskName].taskStart(i)
-          }, 200)
+          callback()
+          const time = new Date().getTime()
+          taskProcessList[taskName].taskStart(currentTaskList[i], time)
           break
         }
       }
@@ -88,26 +86,21 @@ export const createWebSocket = async (httpServer: any) => {
       for (let i = 0; i < currentTaskList.length; i++) {
         const task = currentTaskList[i]
         if (taskName === task.taskName) {
-          setTimeout(async () => {
-            callback()
-            await taskProcessList[taskName].taskStop(i)
-          }, 200)
+          callback()
+          taskProcessList[taskName].taskStop(currentTaskList[i])
           break
         }
       }
     })
     socket.on('startAll', () => {
       for (let i = 0; i < currentTaskList.length; i++) {
-        setTimeout(async () => {
-          await taskProcessList[currentTaskList[i].taskName].taskStart(i)
-        }, 200)
+        const time = new Date().getTime()
+        taskProcessList[currentTaskList[i].taskName].taskStart(currentTaskList[i], time)
       }
     })
     socket.on('stopAll', () => {
       for (let i = 0; i < currentTaskList.length; i++) {
-        setTimeout(async () => {
-          await taskProcessList[currentTaskList[i].taskName].taskStop(i)
-        }, 200)
+        taskProcessList[currentTaskList[i].taskName].taskStop(currentTaskList[i])
       }
     })
     /**

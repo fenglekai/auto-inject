@@ -50,7 +50,7 @@ export default class Register {
     })
   }
 
-  addTask = () => {
+  updateTask = () => {
     this.socket.emit('task', 'update')
   }
 

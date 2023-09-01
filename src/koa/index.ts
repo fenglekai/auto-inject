@@ -96,7 +96,7 @@ export const closeTest = () => {
 ;(async () => {
   initLog()
   await init()
-  await test()
+  // await test()
   console.log('本地缓存文件: ' + store.path)
   console.log('日志路径: ' + log.transports.file.getFile())
 })()

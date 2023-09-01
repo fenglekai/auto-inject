@@ -10,16 +10,25 @@ const schema: any = {
     default: []
   }
 }
+
 export const store = new Store({ schema })
 
-const useStoreGet = (key: string): any => {
-  return store.get(key)
+const useStoreGet = (key: string): Promise<any> => {
+  return new Promise<any>((resolve, reject) => {
+    try {
+      const value: any = store.get(key)
+      resolve(value)
+    } catch (error) {
+      console.error(error)
+      reject(Error('本地写入失败'))
+    }
+  })
 }
-const useStoreSet = (key: string, value: any) => {
-  return new Promise<void>((resolve, reject) => {
+const useStoreSet = (key: string, value: any): Promise<any> => {
+  return new Promise<any>((resolve, reject) => {
     try {
       store.set(key, value)
-      resolve()
+      resolve(true)
     } catch (error) {
       console.error(error)
       reject(Error('本地写入失败'))

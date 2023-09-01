@@ -38,7 +38,7 @@ const handleDeleteTask = async () => {
     return index !== deleteKey.value
   })
   await window.mainApi.setStore('task', list)
-
+  websocket.updateTask()
   deleteCheck.value = false
 }
 
@@ -58,14 +58,18 @@ const handleRunOnce = (key: number) => {
   btnLoading.value = true
   const instance = mainList.value[key]
   websocket.executeSingleTask(instance.taskName, () => {
-    btnLoading.value = false
+    setTimeout(() => {
+      btnLoading.value = false
+    }, 1000)
   })
 }
 const handleStopOnce = (key: number) => {
   btnLoading.value = true
   const instance = mainList.value[key]
   websocket.stopSingleTask(instance.taskName, () => {
-    btnLoading.value = false
+    setTimeout(() => {
+      btnLoading.value = false
+    }, 1000)
   })
 }
 
@@ -111,7 +115,7 @@ const handleImport = () => {
           }
           const taskData = await window.mainApi.getStore('task')
           await window.mainApi.setStore('task', [...taskData, ...res])
-          websocket.addTask()
+          websocket.updateTask()
         } catch (error) {
           console.log(error)
           alert('读取错误')
@@ -145,6 +149,7 @@ const resetCheck = ref(false)
 const handleResetData = async () => {
   await window.mainApi.setStore('task', [])
   await window.mainApi.setStore('taskID', 0)
+  websocket.updateTask()
   resetCheck.value = false
 }
 </script>
@@ -371,10 +376,11 @@ const handleResetData = async () => {
     </v-expansion-panels>
 
     <AddTask
+      :disabled="allBtnStatus"
       :main-list="mainList"
       :edit-status="editStatus"
       :edit-key="editKey"
-      @complete="websocket.addTask()"
+      @complete="websocket.updateTask()"
       @edit-complete="editComplete"
     />
 

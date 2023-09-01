@@ -13,7 +13,13 @@ router.get('/test', async (ctx) => {
   ctx.body = ctx.request.query
 })
 router.post('/test', async (ctx) => {
-  ctx.body = ctx.request.body
+  const promise = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true)
+      ctx.body = ctx.request.body
+    }, 5000)
+  })
+  await promise
 })
 router.use('/plc', PLC)
 router.use('/task', Task)

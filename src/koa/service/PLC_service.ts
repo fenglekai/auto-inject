@@ -46,7 +46,6 @@ class ModbusClient {
         this.client = null
         socket.end()
       })
-
       this.client.socket.connect(options)
     })
 
@@ -68,7 +67,11 @@ class ModbusClient {
     >((resolve, reject) => {
       if (!this.client) return reject(Error('modbus连接失败'))
       try {
-        this.client[readMethod](start, count).then((res) => resolve(res))
+        this.client[readMethod](start, count)
+          .then((res) => resolve(res))
+          .catch((err) => {
+            reject(err)
+          })
       } catch (error) {
         reject(Error('读取错误: ' + error))
       }
