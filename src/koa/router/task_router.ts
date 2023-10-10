@@ -2,6 +2,7 @@ import { resParams } from '@/types'
 import { useStoreGet, useStoreSet } from '../model'
 import Router from '@koa/router'
 import { TaskProcess } from '../service'
+import { currentTaskList, taskProcessList } from './websocket'
 const router = new Router()
 
 router.get('/getTask', async (ctx) => {
@@ -28,15 +29,14 @@ router.post('/setTask', async (ctx) => {
     ctx.body = { message: String(error) }
   }
 })
-const taskProcessList: any = {}
 router.get('/start', async (ctx) => {
   try {
-    const currentTaskList: Array<resParams> = await useStoreGet('task')
     for (let i = 0; i < currentTaskList.length; i++) {
-      taskProcessList[currentTaskList[i].taskName] = new TaskProcess()
-      setTimeout(async () => {
-        await taskProcessList[currentTaskList[i].taskName].taskStart(i)
-      }, 200)
+      if (taskProcessList[currentTaskList[i].taskName] == null) {
+        taskProcessList[currentTaskList[i].taskName] = new TaskProcess()
+      }
+      const time = new Date().getTime()
+      taskProcessList[currentTaskList[i].taskName].taskStart(currentTaskList[i], time)
     }
     ctx.body = { message: 'success' }
   } catch (error) {
@@ -46,13 +46,11 @@ router.get('/start', async (ctx) => {
 })
 router.get('/stop', async (ctx) => {
   try {
-    const currentTaskList: Array<resParams> = await useStoreGet('task')
     for (let i = 0; i < currentTaskList.length; i++) {
-      if (taskProcessList[currentTaskList[i].taskName]) {
-        setTimeout(async () => {
-          await taskProcessList[currentTaskList[i].taskName].taskStop(i)
-        }, 200)
+      if (taskProcessList[currentTaskList[i].taskName] == null) {
+        taskProcessList[currentTaskList[i].taskName] = new TaskProcess()
       }
+      taskProcessList[currentTaskList[i].taskName].taskStop(currentTaskList[i])
     }
     ctx.body = { message: 'success' }
   } catch (error) {

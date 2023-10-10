@@ -6,15 +6,17 @@ import log from '../../main/utils/Log'
 
 let io: Server
 
+export let currentTaskList: Array<resParams>
+export const taskProcessList: any = {}
+
 export const createWebSocket = async (httpServer: any) => {
   io = new Server(httpServer, {
     cors: {
       origin: whitelist[0]
     }
   })
-  let currentTaskList: Array<resParams> = await useStoreGet('task')
+  currentTaskList = await useStoreGet('task')
 
-  const taskProcessList: any = {}
   const initProcess = () => {
     for (let i = 0; i < currentTaskList.length; i++) {
       if (!taskProcessList[currentTaskList[i].taskName]) {

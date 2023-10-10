@@ -88,8 +88,11 @@
       // },
       {
         target: 'deb',
-        // arch: 'x64'
         arch: 'armv7l'
+      },
+      {
+        target: 'deb',
+        arch: 'x64'
       }
       // {
       //   target: 'rpm',
