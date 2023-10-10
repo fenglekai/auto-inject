@@ -12,6 +12,8 @@ Quick Start Templates for **[Vite](https://vitejs.dev)** + **[Vue 3](https://vue
 
 ModbusTCP 可视化图形界面连接工具。提供读写操作 api 接口；创建流程任务：1、监听寄存器变化调用外部接口 2、监听接口值变化写入值到寄存器。
 
+[**接口文档**](./docs/接口说明.md)
+
 ## 技术栈
 
 - Electron
