@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { ModbusClient } from '.'
-import { apiParams, readParams, resParams } from '../../types'
+import { apiParams, readParams, resParams, writeParams } from '../../types'
 
 export class TaskProcess {
   private processTaskStatus: boolean
@@ -28,7 +28,7 @@ export class TaskProcess {
             break
 
           case 'writeModbus':
-            console.log('todo')
+            await this.modbusWrite(mainTask, taskKey)
             break
 
           default:
@@ -73,12 +73,12 @@ export class TaskProcess {
   }
 
   private taskWaitNext = (mainTask: resParams) => {
+    console.log(`${mainTask.taskName} 任务正在等待重置`)
     this.waitNextTimer = setTimeout(async () => {
       try {
         if (!this.processTaskStatus) {
           throw Error('任务已终止')
         }
-        console.log(`${mainTask.taskName} 任务正在等待重置`)
         for (let taskKey = 0; taskKey < mainTask.taskList.length; taskKey++) {
           const currentTask = mainTask.taskList[taskKey]
           switch (currentTask.type) {
@@ -218,6 +218,21 @@ export class TaskProcess {
       currentTask.status = 3
       this.abortController = null
       return Promise.reject(Error('apiRequest error: ' + error.message))
+    }
+  }
+
+  private modbusWrite = async (mainTask: resParams, taskKey: number) => {
+    const currentTask = mainTask.taskList[taskKey]
+    try {
+      currentTask.status = 1
+      const { ip, port, method, writeAddress, writeValue } = currentTask.data as writeParams
+      const client = new ModbusClient()
+      await client.modbusConnect({ ip: ip.replace('localhost', '127.0.0.1'), port: Number(port) })
+      await client.writeRegister(method, Number(writeAddress), Number(writeValue))
+      currentTask.status = 2
+    } catch (error: any) {
+      currentTask.status = 3
+      return Promise.reject(Error('modbusWrite error: ' + error.message))
     }
   }
 }

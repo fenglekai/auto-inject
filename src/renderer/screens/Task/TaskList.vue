@@ -2,7 +2,7 @@
 <script lang="ts" setup>
 import {} from 'vue'
 import Register from '@/renderer/utils/register'
-import { apiParams, readParams, resParams } from '@/types'
+import { apiParams, readParams, resParams, writeParams } from '@/types'
 import AddTask from './AddTask.vue'
 
 onMounted(async () => {
@@ -365,6 +365,22 @@ const handleResetData = async () => {
                     </v-chip>
                     <v-chip class="ms-0" color="blue" label size="small">
                       {{ (task.data as apiParams).url }}
+                    </v-chip>
+                  </div>
+                  <div v-if="task.type === 'writeModbus'">
+                    <v-chip color="blue" label size="small">
+                      {{ `${(task.data as writeParams).ip}:${(task.data as writeParams).port}` }}
+                    </v-chip>
+                    Modbus写入值:
+                    <v-chip class="ms-0 mr-2" color="orange-darken-3" label size="small">
+                      {{ (task.data as writeParams).method }}
+                    </v-chip>
+                    <v-chip class="ms-0" color="orange-darken-3" label size="small">
+                      {{ (task.data as writeParams).writeAddress }}
+                    </v-chip>
+                    =>
+                    <v-chip class="ms-0" label size="small">
+                      {{ (task.data as writeParams).writeValue }}
                     </v-chip>
                   </div>
                 </v-timeline-item>

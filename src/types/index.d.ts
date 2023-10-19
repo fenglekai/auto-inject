@@ -21,9 +21,8 @@ export interface apiParams {
 }
 
 export interface taskListParams {
-  // type: 'readModbus' | 'request' | 'writeModbus' | 'response'
   type: 'readModbus' | 'request' | 'writeModbus'
-  data: Array<readParams> | apiParams | writeParams | Array<{ name: string; value: string }>
+  data: Array<readParams> | apiParams | writeParams
   status: 0 | 1 | 2 | 3 // 0: 未执行 1: 执行中 2: 执行成功 3: 执行失败
 }
 

@@ -3,6 +3,7 @@ import {} from 'vue'
 import { resParams, readParams, apiParams, writeParams, taskListParams } from '@/types'
 import ReadSteps from './ReadSteps.vue'
 import RequestSteps from './RequestSteps.vue'
+import WriteSteps from './WriteSteps.vue'
 
 const props = defineProps({
   disabled: {
@@ -90,7 +91,7 @@ const useTemplate = () => {
 }
 
 const selectedStep = ref('监听ModbusTCP值变化')
-const steps = ['监听ModbusTCP值变化', '调用接口']
+const steps = ['监听ModbusTCP值变化', '调用接口', 'ModbusTCP写入值']
 const currentSteps = ref<Array<taskListParams>>([])
 const handleAddSteps = () => {
   if (selectedStep.value === '监听ModbusTCP值变化') {
@@ -117,6 +118,19 @@ const handleAddSteps = () => {
         method: 'GET',
         url: 'http://localhost:3000/test',
         data: [{ name: 'key', value: 'value' }]
+      }
+    })
+  }
+  if (selectedStep.value === 'ModbusTCP写入值') {
+    currentSteps.value.push({
+      type: 'writeModbus',
+      status: 0,
+      data: {
+        ip: 'localhost',
+        port: '8888',
+        writeAddress: '5',
+        writeValue: '1',
+        method: 'writeSingleCoil'
       }
     })
   }
@@ -285,6 +299,12 @@ const handleEditTask = async () => {
                 v-if="item.type === 'request'"
                 :item-key="index"
                 :current-step="(currentSteps[index].data as apiParams)"
+                @watch-step="watchStep"
+              />
+              <WriteSteps
+                v-if="item.type === 'writeModbus'"
+                :item-key="index"
+                :current-step="(currentSteps[index].data as writeParams)"
                 @watch-step="watchStep"
               />
             </v-card>
