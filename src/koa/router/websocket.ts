@@ -1,8 +1,7 @@
 import { Server } from 'socket.io'
 import { useStoreGet, whitelist } from '../model'
-import { ModbusClient, TaskProcess } from '../service'
+import { ModbusClient, TaskProcess, logRead } from '../service'
 import { resParams } from '../../types'
-import log from '../../main/utils/Log'
 
 let io: Server
 
@@ -112,14 +111,14 @@ export const createWebSocket = async (httpServer: any) => {
     /**
      * 日志读取 start
      */
-    const logRead = async () => {
-      const logFile = log.transports.file.readAllLogs()
-      socket.emit('logFile', logFile[logFile.length - 1])
-    }
+
     let logTimer: any
     socket.on('logFile', () => {
       clearInterval(logTimer)
-      logTimer = setInterval(logRead, 1000)
+      logTimer = setInterval(() => {
+        const data =logRead()
+        socket.emit('logFile', data)
+      }, 1000)
     })
 
     /**

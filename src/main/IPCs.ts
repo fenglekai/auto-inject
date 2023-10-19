@@ -2,7 +2,7 @@ import { BrowserWindow, app, ipcMain, shell } from 'electron'
 import Constants from './utils/Constants'
 import { init, close, status } from '../koa'
 import { useStoreGet, useStoreSet } from '../koa/model'
-import log from './utils/Log'
+import { logRead } from '../koa/service'
 
 /*
  * IPC Communications
@@ -25,8 +25,7 @@ export default class IPCs {
     ipcMain.handle('store:getStore', (ev, key) => useStoreGet(key))
     ipcMain.handle('store:setStore', async (ev, key, value) => await useStoreSet(key, value))
     ipcMain.handle('log:logFile', async () => {
-      const logFile = log.transports.file.readAllLogs()
-      return logFile[logFile.length - 1]
+      return logRead()
     })
     ipcMain.handle('log:openPath', () => {
       const logPath = app.getPath('logs')

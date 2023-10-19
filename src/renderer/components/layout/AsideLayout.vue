@@ -24,6 +24,18 @@ const dialog = ref(false)
         <v-icon icon="mdi-home-city" class="ma-2" color="light-blue" />
       </template>
     </v-list-item>
+    <div class="pa-2">
+      <v-btn block color="green-accent-3" class="mb-2" @click="dialog = true">
+        <v-icon icon="mdi-spider-thread" />
+        <v-tooltip activator="parent" location="bottom"> 日志监控 </v-tooltip>
+      </v-btn>
+      <v-btn block color="primary" @click="handleChangeTheme">
+        <v-icon icon="mdi-brightness-6" />
+        <v-tooltip activator="parent" location="bottom">
+          {{ $t('menu.change-theme') }}
+        </v-tooltip>
+      </v-btn>
+    </div>
 
     <v-divider></v-divider>
 
@@ -44,21 +56,6 @@ const dialog = ref(false)
         @click="handleRoute('/task')"
       ></v-list-item>
     </v-list>
-
-    <template #append>
-      <div class="pa-2">
-        <v-btn block color="green-accent-3" class="mb-2" @click="dialog = true">
-          <v-icon icon="mdi-spider-thread" />
-          <v-tooltip activator="parent" location="bottom"> 日志监控 </v-tooltip>
-        </v-btn>
-        <v-btn block color="primary" @click="handleChangeTheme">
-          <v-icon icon="mdi-brightness-6" />
-          <v-tooltip activator="parent" location="bottom">
-            {{ $t('menu.change-theme') }}
-          </v-tooltip>
-        </v-btn>
-      </div>
-    </template>
   </v-navigation-drawer>
 
   <v-dialog v-model="dialog" width="auto">
