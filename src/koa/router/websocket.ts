@@ -77,8 +77,7 @@ export const createWebSocket = async (httpServer: any) => {
         const task = currentTaskList[i]
         if (taskName === task.taskName && !task.taskStatus) {
           callback()
-          const time = new Date().getTime()
-          taskProcessList[taskName].taskStart(currentTaskList[i], time)
+          taskProcessList[taskName].taskStart(currentTaskList[i])
           break
         }
       }
@@ -95,13 +94,22 @@ export const createWebSocket = async (httpServer: any) => {
     })
     socket.on('startAll', () => {
       for (let i = 0; i < currentTaskList.length; i++) {
-        const time = new Date().getTime()
-        taskProcessList[currentTaskList[i].taskName].taskStart(currentTaskList[i], time)
+        taskProcessList[currentTaskList[i].taskName].taskStart(currentTaskList[i])
       }
     })
     socket.on('stopAll', () => {
       for (let i = 0; i < currentTaskList.length; i++) {
         taskProcessList[currentTaskList[i].taskName].taskStop(currentTaskList[i])
+      }
+    })
+
+    socket.on('retry', (taskName) => {
+      for (let i = 0; i < currentTaskList.length; i++) {
+        const task = currentTaskList[i]
+        if (taskName === task.taskName) {
+          taskProcessList[taskName].taskRetry(currentTaskList[i])
+          break
+        }
       }
     })
     /**

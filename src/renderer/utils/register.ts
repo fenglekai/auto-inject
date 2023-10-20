@@ -74,6 +74,10 @@ export default class Register {
     this.socket.emit('stopAll', true)
   }
 
+  retrySingleTask = (taskName: string) => {
+    this.socket.emit('retry', taskName)
+  }
+
   watchLog = async (callback: (log: any) => void) => {
     this.socket.connect()
     this.socket.emit('logFile', true)

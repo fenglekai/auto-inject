@@ -1,7 +1,8 @@
 import log from '../../main/utils/Log'
 
-export * from './PLC_service'
+export * from './PLCService'
 export * from './taskService'
+export * from './RMSTaskService'
 
 export const logRead = () => {
   const logFile = log.transports.file.readAllLogs().filter(item => {

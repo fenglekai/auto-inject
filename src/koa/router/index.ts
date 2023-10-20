@@ -1,6 +1,6 @@
 import Router from '@koa/router'
-import PLC from './PLC_router'
-import Task from './task_router'
+import PLC from './PLCRouter'
+import Task from './taskRouter'
 import { whitelist } from '../model'
 export * from './websocket'
 

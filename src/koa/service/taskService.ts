@@ -6,16 +6,21 @@ export class TaskProcess {
   private processTaskStatus: boolean
   private abortController: AbortController | null
   private waitNextTimer: any
+  private response: Array<any>
+  private errorStep: number
   constructor() {
     this.processTaskStatus = false
     this.abortController = null
+    this.response = []
+    this.errorStep = 0
   }
 
-  taskStart = async (mainTask: resParams) => {
+  taskStart = async (mainTask: resParams, stepKey = 0) => {
     this.processTaskStatus = true
     mainTask.taskStatus = 1
+    let taskKey = stepKey
     try {
-      for (let taskKey = 0; taskKey < mainTask.taskList.length; taskKey++) {
+      for (taskKey; taskKey < mainTask.taskList.length; taskKey++) {
         const currentTask = mainTask.taskList[taskKey]
         console.log(`${mainTask.taskName} Step ${taskKey + 1} 正在执行`)
         switch (currentTask.type) {
@@ -43,7 +48,15 @@ export class TaskProcess {
       } else {
         console.error(error)
         mainTask.taskStatus = 3
+        this.errorStep = taskKey
       }
+    }
+  }
+
+  taskRetry = (mainTask: resParams) => {
+    if (mainTask.taskStatus === 3) {
+      mainTask.taskStatus = 1
+      this.taskStart(mainTask, this.errorStep)
     }
   }
 
@@ -206,7 +219,8 @@ export class TaskProcess {
         config.data = JSON.parse(data)
       }
       const res = await axios.request(config)
-      console.log(res.data)
+      // console.log(res.data)
+      this.response.push(res.data)
       currentTask.status = 2
       this.abortController = null
       return true

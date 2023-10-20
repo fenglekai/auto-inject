@@ -85,6 +85,10 @@ const handleRunAll = () => {
 const handleStopAll = () => {
   websocket.stopAllTask()
 }
+const handleRetry = (key: number) => {
+  const instance = mainList.value[key]
+  websocket.retrySingleTask(instance.taskName)
+}
 const handleExpendAll = () => {
   panel.value = mainList.value.map((item) => {
     return item.taskName
@@ -268,6 +272,19 @@ const handleResetData = async () => {
                       class="ml-2"
                       v-bind="props"
                       @click="handleRunOnce(mainIndex)"
+                    ></v-btn>
+                  </template>
+                </v-tooltip>
+                <v-tooltip :disabled="!main.taskStatus" text="重试" location="bottom">
+                  <template #activator="{ props }">
+                    <v-btn
+                      :disabled="main.taskStatus !== 3"
+                      color="red"
+                      icon="mdi-reload"
+                      size="small"
+                      class="ml-2"
+                      v-bind="props"
+                      @click="handleRetry(mainIndex)"
                     ></v-btn>
                   </template>
                 </v-tooltip>
