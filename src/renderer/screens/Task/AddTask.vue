@@ -197,9 +197,11 @@ const handleEditTask = async () => {
     return ctx.proxy.$snackbar({
       message: '请添加步骤'
     })
-  const toRawStep = toRaw(currentSteps.value)
   const toRawList = toRaw(props.mainList)
-  toRawList[props.editKey].taskList = toRawStep
+  toRawList[props.editKey].taskList.length = 0
+  for (const key in currentSteps.value) {
+    toRawList[props.editKey].taskList.push(toRaw(currentSteps.value[key]))
+  }
   await window.mainApi.setStore('task', [...toRawList])
   emits('complete', true)
   dialog.value = false
@@ -248,7 +250,7 @@ const handleEditTask = async () => {
       <v-divider></v-divider>
       <v-card-text>
         <v-form ref="form" @submit.prevent>
-          <template v-for="(item, index) in currentSteps" :key="index">
+          <template v-for="(item, index) in currentSteps" :key="index + JSON.stringify(item.data)">
             <v-card class="pa-4 mb-2" variant="outlined">
               <v-row justify="end">
                 <v-col cols="auto">
