@@ -279,7 +279,7 @@ const handleResetData = async () => {
                   <template #activator="{ props }">
                     <v-btn
                       :disabled="main.taskStatus !== 3"
-                      color="red"
+                      color="primary"
                       icon="mdi-reload"
                       size="small"
                       class="ml-2"
