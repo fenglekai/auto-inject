@@ -6,12 +6,12 @@ export class TaskProcess {
   private processTaskStatus: boolean
   private abortController: AbortController | null
   private waitNextTimer: any
-  private response: Array<any>
+  private stepsResponse: Array<any>
   private errorStep: number
   constructor() {
     this.processTaskStatus = false
     this.abortController = null
-    this.response = []
+    this.stepsResponse = []
     this.errorStep = 0
   }
 
@@ -19,6 +19,9 @@ export class TaskProcess {
     this.processTaskStatus = true
     mainTask.taskStatus = 1
     let taskKey = stepKey
+    if (!this.stepsResponse.length) {
+      this.stepsResponse = Array(mainTask.taskList.length).fill(null)
+    }
     try {
       for (taskKey; taskKey < mainTask.taskList.length; taskKey++) {
         const currentTask = mainTask.taskList[taskKey]
@@ -34,6 +37,14 @@ export class TaskProcess {
 
           case 'writeModbus':
             await this.modbusWrite(mainTask, taskKey)
+            break
+
+          case 'readDB':
+            console.log('TODO')
+            break
+
+          case 'writeDB':
+            console.log('TODO')
             break
 
           default:
@@ -68,6 +79,7 @@ export class TaskProcess {
 
   private resetTask = async (mainTask: resParams) => {
     mainTask.taskStatus = 0
+    this.stepsResponse.length = 0
     clearTimeout(this.waitNextTimer)
     for (let taskKey = 0; taskKey < mainTask.taskList.length; taskKey++) {
       const currentTask = mainTask.taskList[taskKey]
@@ -120,6 +132,10 @@ export class TaskProcess {
     }, 3 * 1000)
   }
 
+  private localhostReplace = (ip: string) => {
+    return ip.replace('localhost', '127.0.0.1')
+  }
+
   private modbusRead = async (
     mainTask: resParams,
     taskKey: number,
@@ -137,7 +153,7 @@ export class TaskProcess {
           )[i]
           const client = new ModbusClient()
           client
-            .modbusConnect({ ip: ip.replace('localhost', '127.0.0.1'), port: Number(port) })
+            .modbusConnect({ ip: this.localhostReplace(ip), port: Number(port) })
             .then(() => {
               const loop = async () => {
                 if (!this.processTaskStatus) {
@@ -198,10 +214,10 @@ export class TaskProcess {
     const currentTask = mainTask.taskList[taskKey]
     try {
       currentTask.status = 1
-      const { url, method, data } = currentTask.data as apiParams
+      const { url, method, data, useResponse, beforeResponse } = currentTask.data as apiParams
       this.abortController = new AbortController()
       const config: AxiosRequestConfig<any> = {
-        url: url.replace('localhost', '127.0.0.1'),
+        url: this.localhostReplace(url),
         method,
         timeout: 30 * 1000,
         proxy: false,
@@ -218,9 +234,14 @@ export class TaskProcess {
       if (method === 'POST') {
         config.data = JSON.parse(data)
       }
+      if (useResponse) {
+        for (const key in beforeResponse) {
+          const { step, selected } = beforeResponse[key]
+          config.data[key] = this.stepsResponse[step][selected]
+        }
+      }
       const res = await axios.request(config)
-      // console.log(res.data)
-      this.response.push(res.data)
+      this.stepsResponse[taskKey] = res.data
       currentTask.status = 2
       this.abortController = null
       return true
@@ -241,8 +262,22 @@ export class TaskProcess {
       currentTask.status = 1
       const { ip, port, method, writeAddress, writeValue } = currentTask.data as writeParams
       const client = new ModbusClient()
-      await client.modbusConnect({ ip: ip.replace('localhost', '127.0.0.1'), port: Number(port) })
+      await client.modbusConnect({ ip: this.localhostReplace(ip), port: Number(port) })
       await client.writeRegister(method, Number(writeAddress), Number(writeValue))
+      currentTask.status = 2
+    } catch (error: any) {
+      currentTask.status = 3
+      return Promise.reject(Error('modbusWrite error: ' + error.message))
+    }
+  }
+
+  private DBRead = async (mainTask: resParams, taskKey: number) => {
+    const currentTask = mainTask.taskList[taskKey]
+    try {
+      currentTask.status = 1
+      // const { ip, port, method, writeAddress, writeValue } = currentTask.data as writeParams
+      // await client.modbusConnect({ ip: this.localhostReplace(ip), port: Number(port) })
+      // await client.writeRegister(method, Number(writeAddress), Number(writeValue))
       currentTask.status = 2
     } catch (error: any) {
       currentTask.status = 3
