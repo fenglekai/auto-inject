@@ -2,18 +2,19 @@ import { MongoClient } from 'mongodb'
 
 export class MongoDBClient {
   client: MongoClient | null
-  constructor() {
+  mongoUrl: string
+  constructor(url: string) {
     this.client = null
+    this.mongoUrl = `mongodb://${this.localhostReplace(url)}`
   }
 
   private localhostReplace = (ip: string) => {
     return ip.replace('localhost', '127.0.0.1')
   }
 
-  connect = async (url: string) => {
+  connect = async () => {
     // Connection URL
-    const mongoUrl = `mongodb://${this.localhostReplace(url)}`
-    this.client = new MongoClient(mongoUrl)
+    this.client = new MongoClient(this.mongoUrl)
 
     // Use connect method to connect to the server
     await this.client.connect()
