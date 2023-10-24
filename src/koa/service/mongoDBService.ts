@@ -1,4 +1,5 @@
-import { MongoClient } from 'mongodb'
+import type { MongoClient } from 'mongodb'
+const mongodb = require('mongodb');
 
 export class MongoDBClient {
   client: MongoClient | null
@@ -14,10 +15,10 @@ export class MongoDBClient {
 
   connect = async () => {
     // Connection URL
-    this.client = new MongoClient(this.mongoUrl)
+    this.client = new mongodb.MongoClient(this.mongoUrl)
 
     // Use connect method to connect to the server
-    await this.client.connect()
+    await this.client?.connect()
     return 'Connected successfully to mongo server'
   }
 
