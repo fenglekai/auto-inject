@@ -18,6 +18,10 @@ class ModbusClient {
     this.client = null
   }
 
+  private localhostReplace = (ip: string) => {
+    return ip.replace('localhost', '127.0.0.1')
+  }
+
   modbusConnect = (params: ConnectParams) =>
     new Promise<void | string>((resolve, reject) => {
       const { ip, port } = params
@@ -25,7 +29,7 @@ class ModbusClient {
       if (this.client) return resolve()
       this.client = new client.TCP(socket)
       const options = {
-        host: ip,
+        host: this.localhostReplace(ip),
         port
       }
       this.client.socket.setTimeout(1000 * 5, () => {
