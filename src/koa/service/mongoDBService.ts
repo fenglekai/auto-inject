@@ -55,7 +55,8 @@ export class MongoDBClient {
     throw Error('Client is not connected')
   }
 
-  remove = async (DBName: string, tabName: string, data: any = {}) => {
+  remove = async (DBName: string, tabName: string, data: any = null) => {
+    if (!data) throw Error('删除的对象没有找到')
     if (this.client) {
       const collection = this.client.db(DBName).collection(tabName)
       const result = await collection.deleteMany(data)
