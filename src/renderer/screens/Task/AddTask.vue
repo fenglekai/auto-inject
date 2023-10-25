@@ -85,7 +85,9 @@ const useTemplate = () => {
     data: {
       method: 'GET',
       url: 'http://localhost:3000/test',
-      data: [{ name: 'key', value: 'value' }]
+      data: [{ name: 'key', value: 'value' }],
+      useResponse: false,
+      beforeResponse: {}
     }
   })
 }
@@ -117,7 +119,9 @@ const handleAddSteps = () => {
       data: {
         method: 'GET',
         url: 'http://localhost:3000/test',
-        data: [{ name: 'key', value: 'value' }]
+        data: [{ name: 'key', value: 'value' }],
+        useResponse: false,
+        beforeResponse: {}
       }
     })
   }
