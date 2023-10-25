@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { ModbusClient } from '.'
-import { apiParams, readParams, resParams, writeParams } from '../../types'
+import { ModbusClient, MongoDBClient } from '.'
+import { DBParams, apiParams, readParams, resParams, writeParams } from '../../types'
 
 export class TaskProcess {
   private processTaskStatus: boolean
@@ -24,32 +24,33 @@ export class TaskProcess {
     }
     try {
       for (taskKey; taskKey < mainTask.taskList.length; taskKey++) {
+        if (!this.processTaskStatus) {
+          throw Error('任务已终止')
+        }
         const currentTask = mainTask.taskList[taskKey]
         console.log(`${mainTask.taskName} Step ${taskKey + 1} 正在执行`)
+        let res: any = false
         switch (currentTask.type) {
           case 'readModbus':
-            await this.modbusRead(mainTask, taskKey)
+            res = await this.modbusRead(mainTask, taskKey)
             break
 
           case 'request':
-            await this.apiRequest(mainTask, taskKey)
+            res = await this.apiRequest(mainTask, taskKey)
             break
 
           case 'writeModbus':
-            await this.modbusWrite(mainTask, taskKey)
+            res = await this.modbusWrite(mainTask, taskKey)
             break
 
-          case 'readDB':
-            console.log('TODO')
-            break
-
-          case 'writeDB':
-            console.log('TODO')
+          case 'findDB' || 'updateDB' || 'removeDB' || 'insertDB':
+            res = await this.DBOperations(mainTask, taskKey)
             break
 
           default:
             break
         }
+        this.stepsResponse[taskKey] = res
       }
       this.taskWaitNext(mainTask)
     } catch (error) {
@@ -71,13 +72,13 @@ export class TaskProcess {
     }
   }
 
-  taskStop = async (mainTask: resParams) => {
+  taskStop = (mainTask: resParams) => {
     this.processTaskStatus = false
     this.abortController?.abort()
     this.resetTask(mainTask)
   }
 
-  private resetTask = async (mainTask: resParams) => {
+  private resetTask = (mainTask: resParams) => {
     mainTask.taskStatus = 0
     this.stepsResponse.length = 0
     clearTimeout(this.waitNextTimer)
@@ -132,28 +133,24 @@ export class TaskProcess {
     }, 3 * 1000)
   }
 
-  private localhostReplace = (ip: string) => {
-    return ip.replace('localhost', '127.0.0.1')
-  }
-
   private modbusRead = async (
     mainTask: resParams,
     taskKey: number,
     isNextTicker: boolean = false
-  ) => {
+  ): Promise<any> => {
     const readTimer: any[] = []
     const currentTask = mainTask.taskList[taskKey]
     try {
       currentTask.status = 1
       const passList = new Array((currentTask.data as readParams[]).length).fill(false)
-      const promise = new Promise((resolve, reject) => {
+      const promise: Promise<any> = new Promise((resolve, reject) => {
         for (let i = 0; i < (currentTask.data as readParams[]).length; i++) {
           const { ip, port, readAddress, readValue, method } = (
             currentTask.data as Array<readParams>
           )[i]
           const client = new ModbusClient()
           client
-            .modbusConnect({ ip: this.localhostReplace(ip), port: Number(port) })
+            .modbusConnect({ ip, port: Number(port) })
             .then(() => {
               const loop = async () => {
                 if (!this.processTaskStatus) {
@@ -199,7 +196,8 @@ export class TaskProcess {
             })
         }
       })
-      return promise
+      const result = await promise
+      return result
     } catch (error) {
       for (const key in readTimer) {
         clearTimeout(readTimer[key])
@@ -208,6 +206,10 @@ export class TaskProcess {
       currentTask.status = 3
       return Promise.reject(error)
     }
+  }
+
+  private localhostReplace = (ip: string) => {
+    return ip.replace('localhost', '127.0.0.1')
   }
 
   private apiRequest = async (mainTask: resParams, taskKey: number) => {
@@ -237,14 +239,17 @@ export class TaskProcess {
       if (useResponse) {
         for (const key in beforeResponse) {
           const { step, selected } = beforeResponse[key]
-          config.data[key] = this.stepsResponse[step][selected]
+          if (method === 'GET') {
+            config.params[key] = this.stepsResponse[step][selected]
+          } else {
+            config.data[key] = this.stepsResponse[step][selected]
+          }
         }
       }
       const res = await axios.request(config)
-      this.stepsResponse[taskKey] = res.data
       currentTask.status = 2
       this.abortController = null
-      return true
+      return res.data
     } catch (error: any) {
       if (String(error).includes('canceled')) {
         this.abortController = null
@@ -262,26 +267,55 @@ export class TaskProcess {
       currentTask.status = 1
       const { ip, port, method, writeAddress, writeValue } = currentTask.data as writeParams
       const client = new ModbusClient()
-      await client.modbusConnect({ ip: this.localhostReplace(ip), port: Number(port) })
+      await client.modbusConnect({ ip, port: Number(port) })
       await client.writeRegister(method, Number(writeAddress), Number(writeValue))
       currentTask.status = 2
+      return true
     } catch (error: any) {
       currentTask.status = 3
-      return Promise.reject(Error('modbusWrite error: ' + error.message))
+      return Promise.reject(Error('modbusWrite error: ' + error))
     }
   }
 
-  private DBRead = async (mainTask: resParams, taskKey: number) => {
+  private DBOperations = async (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
     try {
       currentTask.status = 1
-      // const { ip, port, method, writeAddress, writeValue } = currentTask.data as writeParams
-      // await client.modbusConnect({ ip: this.localhostReplace(ip), port: Number(port) })
-      // await client.writeRegister(method, Number(writeAddress), Number(writeValue))
+      const { url, DBName, tabName, data, setData, useResponse, beforeResponse } =
+        currentTask.data as DBParams
+      const client = new MongoDBClient(url)
+      await client.connect()
+      const useData = { ...data }
+      const useSetData = { ...setData }
+      if (useResponse) {
+        for (const key in beforeResponse.data) {
+          const { step, selected } = beforeResponse.data[key]
+          useData[key] = this.stepsResponse[step][selected]
+        }
+        for (const key in beforeResponse.setData) {
+          const { step, selected } = beforeResponse.setData[key]
+          useSetData[key] = this.stepsResponse[step][selected]
+        }
+      }
+      let res: any
+      if (currentTask.type === 'findDB') {
+        res = await client.find(DBName, tabName, useData)
+      }
+      if (currentTask.type === 'updateDB') {
+        res = await client.update(DBName, tabName, useData, useSetData)
+      }
+      if (currentTask.type === 'removeDB') {
+        res = await client.remove(DBName, tabName, useData)
+      }
+      if (currentTask.type === 'insertDB') {
+        res = await client.insert(DBName, tabName, useData)
+      }
       currentTask.status = 2
+      await client.disconnect()
+      return res
     } catch (error: any) {
       currentTask.status = 3
-      return Promise.reject(Error('modbusWrite error: ' + error.message))
+      return Promise.reject(Error('DBOperations error: ' + error))
     }
   }
 }
