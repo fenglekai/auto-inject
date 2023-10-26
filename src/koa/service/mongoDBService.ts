@@ -1,5 +1,5 @@
 import type { MongoClient } from 'mongodb'
-const mongodb = require('mongodb');
+const mongodb = require('mongodb')
 
 export class MongoDBClient {
   client: MongoClient | null

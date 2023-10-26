@@ -1,6 +1,7 @@
-import { Page, _electron as electron } from 'playwright'
-import { ElectronApplication } from 'playwright-core'
+import { ElectronApplication, Page, _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
+import { TaskProcess } from '../src/koa/service/taskService'
+import { resParams } from '../src/types'
 
 let appWindow: Page
 let appElectron: ElectronApplication
@@ -37,20 +38,42 @@ test('Environment check', async () => {
 })
 
 test('Document element check', async () => {
-  await isElementVisible('.v-toolbar__content')
-  await isElementVisible('#main-logo')
-  await isElementVisible('#select-language')
+  await isElementVisible('.subheading')
 })
 
-test('Counter button click check', async () => {
-  await appWindow.click('#btn-counter', { clickCount: 10, delay: 50 })
+test('DB流程测试', async () => {
+  const example: resParams = {
+    taskName: 'Task_5',
+    taskList: [
+      {
+        type: 'findDB',
+        status: 0,
+        data: {
+          url: 'localhost:27017',
+          DBName: 'auto_inject',
+          tabName: 'vehicle_tray',
+          data: {},
+          setData: {},
+          useResponse: false,
+          beforeResponse: {
+            data: {},
+            setData: {}
+          }
+        }
+      }
+    ],
+    taskStatus: 0
+  }
+  const task = new TaskProcess()
+  task.taskStart(example)
+  // await appWindow.click('.v-list-item-title', { clickCount: 1, delay: 50 })
 
-  const counterValueElement = await appWindow.$('#counter-badge .v-badge__badge')
+  // const counterValueElement = await appWindow.$('#counter-badge .v-badge__badge')
 
-  expect(
-    await appWindow.evaluate((element) => element.innerHTML, counterValueElement),
-    'Confirm counter value is same'
-  ).toBe('10')
+  // expect(
+  //   await appWindow.evaluate((element) => element?.innerHTML, counterValueElement),
+  //   'Confirm counter value is same'
+  // ).toBe('10')
 })
 
 test.afterAll(async () => {

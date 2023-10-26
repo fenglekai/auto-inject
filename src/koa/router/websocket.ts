@@ -124,7 +124,7 @@ export const createWebSocket = async (httpServer: any) => {
     socket.on('logFile', () => {
       clearInterval(logTimer)
       logTimer = setInterval(() => {
-        const data =logRead()
+        const data = logRead()
         socket.emit('logFile', data)
       }, 1000)
     })

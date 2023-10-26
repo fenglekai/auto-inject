@@ -1,6 +1,6 @@
 {
   "name": "auto-inject",
-  "version": "1.20.beta",
+  "version": "1.2.0",
   "description": "Custom workflow client.",
   "homepage": "https://vutron.jooy2.com",
   "author": "fenglekai<fenglekai@gmail.com>",
@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@mdi/font": "^7.2.96",
-    "@playwright/test": "^1.35.1",
+    "@playwright/test": "^1.39.0",
     "@types/koa": "^2.13.7",
     "@types/koa__router": "^12.0.0",
     "@types/node": "^20.5.0",
@@ -77,7 +77,7 @@
     "eslint-plugin-vue": "^9.15.1",
     "nodemon": "^3.0.1",
     "pkg": "^5.8.1",
-    "playwright": "^1.35.1",
+    "playwright": "^1.39.0",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4",
