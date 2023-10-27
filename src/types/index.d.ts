@@ -44,7 +44,7 @@ export interface DBParams {
 }
 
 export interface taskListParams {
-  type: 'readModbus' | 'request' | 'writeModbus' | 'DBOperation'
+  type: 'readModbus' | 'request' | 'writeModbus' | 'MongoDBOperation'
   data: Array<readParams> | apiParams | writeParams | DBParams
   status: 0 | 1 | 2 | 3 // 0: 未执行 1: 执行中 2: 执行成功 3: 执行失败
   resultData: any

@@ -6,7 +6,7 @@ const DBTaskTest = async () => {
     taskName: 'Task_5',
     taskList: [
       {
-        type: 'DBOperation',
+        type: 'MongoDBOperation',
         status: 0,
         data: {
           url: 'localhost:27017',
@@ -24,7 +24,7 @@ const DBTaskTest = async () => {
         resultData: {}
       },
       {
-        type: 'DBOperation',
+        type: 'MongoDBOperation',
         status: 0,
         data: {
           url: 'localhost:27017',

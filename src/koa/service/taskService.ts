@@ -38,7 +38,7 @@ export class TaskProcess {
             res = await this.modbusWrite(mainTask, taskKey)
             break
 
-          case 'DBOperation':
+          case 'MongoDBOperation':
             res = await this.DBOperations(mainTask, taskKey)
             break
 
@@ -348,7 +348,7 @@ export class TaskProcess {
       return res
     } catch (error: any) {
       currentTask.status = 3
-      return Promise.reject(Error('DBOperations error: ' + error))
+      return Promise.reject(Error('MongoDBOperations error: ' + error))
     }
   }
 }

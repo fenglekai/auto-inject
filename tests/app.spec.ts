@@ -58,7 +58,7 @@ test('主流程测试', async () => {
         resultData: {}
       },
       {
-        type: 'DBOperation',
+        type: 'MongoDBOperation',
         status: 0,
         data: {
           url: 'localhost:27017',
@@ -101,7 +101,7 @@ test('主流程测试', async () => {
         resultData: {}
       },
       {
-        type: 'DBOperation',
+        type: 'MongoDBOperation',
         status: 0,
         data: {
           url: 'localhost:27017',
