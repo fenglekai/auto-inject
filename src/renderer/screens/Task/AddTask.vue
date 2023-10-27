@@ -77,7 +77,8 @@ const useTemplate = () => {
         watchValue: null,
         method: 'readCoils'
       }
-    ]
+    ],
+    resultData: {}
   })
   currentSteps.value.push({
     type: 'request',
@@ -88,7 +89,8 @@ const useTemplate = () => {
       data: [{ name: 'key', value: 'value' }],
       useResponse: false,
       beforeResponse: {}
-    }
+    },
+    resultData: {}
   })
 }
 
@@ -109,7 +111,8 @@ const handleAddSteps = () => {
           watchValue: null,
           method: 'readCoils'
         }
-      ]
+      ],
+      resultData: {}
     })
   }
   if (selectedStep.value === '调用接口') {
@@ -122,7 +125,8 @@ const handleAddSteps = () => {
         data: [{ name: 'key', value: 'value' }],
         useResponse: false,
         beforeResponse: {}
-      }
+      },
+      resultData: {}
     })
   }
   if (selectedStep.value === 'ModbusTCP写入值') {
@@ -135,7 +139,8 @@ const handleAddSteps = () => {
         writeAddress: '5',
         writeValue: '1',
         method: 'writeSingleCoil'
-      }
+      },
+      resultData: {}
     })
   }
 }

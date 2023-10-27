@@ -6,12 +6,10 @@ export class TaskProcess {
   private processTaskStatus: boolean
   private abortController: AbortController | null
   private waitNextTimer: any
-  private stepsResponse: Array<any>
   private errorStep: number
   constructor() {
     this.processTaskStatus = false
     this.abortController = null
-    this.stepsResponse = []
     this.errorStep = 0
   }
 
@@ -19,9 +17,6 @@ export class TaskProcess {
     this.processTaskStatus = true
     mainTask.taskStatus = 1
     let taskKey = stepKey
-    if (!this.stepsResponse.length) {
-      this.stepsResponse = Array(mainTask.taskList.length).fill(null)
-    }
     try {
       for (taskKey; taskKey < mainTask.taskList.length; taskKey++) {
         if (!this.processTaskStatus) {
@@ -47,10 +42,22 @@ export class TaskProcess {
             res = await this.DBOperations(mainTask, taskKey)
             break
 
+          case 'updateDB':
+            res = await this.DBOperations(mainTask, taskKey)
+            break
+
+          case 'removeDB':
+            res = await this.DBOperations(mainTask, taskKey)
+            break
+
+          case 'insertDB':
+            res = await this.DBOperations(mainTask, taskKey)
+            break
+
           default:
             break
         }
-        this.stepsResponse[taskKey] = res
+        mainTask.taskList[taskKey].resultData = res
       }
       this.taskWaitNext(mainTask)
     } catch (error) {
@@ -80,7 +87,6 @@ export class TaskProcess {
 
   private resetTask = (mainTask: resParams) => {
     mainTask.taskStatus = 0
-    this.stepsResponse.length = 0
     clearTimeout(this.waitNextTimer)
     for (let taskKey = 0; taskKey < mainTask.taskList.length; taskKey++) {
       const currentTask = mainTask.taskList[taskKey]
@@ -212,6 +218,45 @@ export class TaskProcess {
     return ip.replace('localhost', '127.0.0.1')
   }
 
+  private getBeforeValue = (beforeData: any, selected: string[] | undefined) => {
+    let value: any = ''
+    let keys: Array<string>
+    let index: any
+    if (selected) {
+      if (selected.length === 1) {
+        if (selected[0].includes('->')) {
+          keys = selected[0].split('->')
+          keys.forEach((key) => {
+            if (!index) {
+              index = beforeData[key]
+            } else {
+              index = index[key]
+            }
+          })
+          return index
+        }
+        return beforeData[selected[0]]
+      }
+      for (let i = 0; i < selected.length; i++) {
+        if (selected[i].includes('->')) {
+          keys = selected[i].split('->')
+          index = undefined
+          keys.forEach((key) => {
+            if (!index) {
+              index = beforeData[key]
+            } else {
+              index = index[key]
+            }
+          })
+          value += String(index)
+        } else {
+          value += String(beforeData[selected[i]])
+        }
+      }
+    }
+    return value
+  }
+
   private apiRequest = async (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
     try {
@@ -240,9 +285,9 @@ export class TaskProcess {
         for (const key in beforeResponse) {
           const { step, selected } = beforeResponse[key]
           if (method === 'GET') {
-            config.params[key] = this.stepsResponse[step][selected]
+            config.params[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
           } else {
-            config.data[key] = this.stepsResponse[step][selected]
+            config.data[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
           }
         }
       }
@@ -290,13 +335,14 @@ export class TaskProcess {
       if (useResponse) {
         for (const key in beforeResponse.data) {
           const { step, selected } = beforeResponse.data[key]
-          useData[key] = this.stepsResponse[step][selected]
+          useData[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
         }
         for (const key in beforeResponse.setData) {
           const { step, selected } = beforeResponse.setData[key]
-          useSetData[key] = this.stepsResponse[step][selected]
+          useSetData[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
         }
       }
+      console.log(useData)
       let res: any
       if (currentTask.type === 'findDB') {
         res = await client.find(DBName, tabName, useData)
