@@ -31,6 +31,7 @@ export interface apiParams {
 
 export interface DBParams {
   url: string
+  method: 'findDB' | 'updateDB' | 'removeDB' | 'insertDB'
   DBName: string
   tabName: string
   data: any
@@ -43,7 +44,7 @@ export interface DBParams {
 }
 
 export interface taskListParams {
-  type: 'readModbus' | 'request' | 'writeModbus' | 'findDB' | 'updateDB' | 'removeDB' | 'insertDB'
+  type: 'readModbus' | 'request' | 'writeModbus' | 'DBOperation'
   data: Array<readParams> | apiParams | writeParams | DBParams
   status: 0 | 1 | 2 | 3 // 0: 未执行 1: 执行中 2: 执行成功 3: 执行失败
   resultData: any

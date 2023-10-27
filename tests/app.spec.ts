@@ -58,10 +58,11 @@ test('主流程测试', async () => {
         resultData: {}
       },
       {
-        type: 'findDB',
+        type: 'DBOperation',
         status: 0,
         data: {
           url: 'localhost:27017',
+          method: 'findDB',
           DBName: 'auto_inject',
           tabName: 'vehicle_tray',
           data: { status: 0 },
@@ -100,10 +101,11 @@ test('主流程测试', async () => {
         resultData: {}
       },
       {
-        type: 'updateDB',
+        type: 'DBOperation',
         status: 0,
         data: {
           url: 'localhost:27017',
+          method: 'updateDB',
           DBName: 'auto_inject',
           tabName: 'vehicle_tray',
           data: {},

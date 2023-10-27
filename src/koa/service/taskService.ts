@@ -38,19 +38,7 @@ export class TaskProcess {
             res = await this.modbusWrite(mainTask, taskKey)
             break
 
-          case 'findDB' || 'updateDB' || 'removeDB' || 'insertDB':
-            res = await this.DBOperations(mainTask, taskKey)
-            break
-
-          case 'updateDB':
-            res = await this.DBOperations(mainTask, taskKey)
-            break
-
-          case 'removeDB':
-            res = await this.DBOperations(mainTask, taskKey)
-            break
-
-          case 'insertDB':
+          case 'DBOperation':
             res = await this.DBOperations(mainTask, taskKey)
             break
 
@@ -326,7 +314,7 @@ export class TaskProcess {
     const currentTask = mainTask.taskList[taskKey]
     try {
       currentTask.status = 1
-      const { url, DBName, tabName, data, setData, useResponse, beforeResponse } =
+      const { url, method, DBName, tabName, data, setData, useResponse, beforeResponse } =
         currentTask.data as DBParams
       const client = new MongoDBClient(url)
       await client.connect()
@@ -342,18 +330,17 @@ export class TaskProcess {
           useSetData[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
         }
       }
-      console.log(useData)
       let res: any
-      if (currentTask.type === 'findDB') {
+      if (method === 'findDB') {
         res = await client.find(DBName, tabName, useData)
       }
-      if (currentTask.type === 'updateDB') {
+      if (method === 'updateDB') {
         res = await client.update(DBName, tabName, useData, useSetData)
       }
-      if (currentTask.type === 'removeDB') {
+      if (method === 'removeDB') {
         res = await client.remove(DBName, tabName, useData)
       }
-      if (currentTask.type === 'insertDB') {
+      if (method === 'insertDB') {
         res = await client.insert(DBName, tabName, useData)
       }
       currentTask.status = 2
