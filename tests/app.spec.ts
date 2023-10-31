@@ -85,15 +85,15 @@ test('主流程测试', async () => {
           useResponse: true,
           beforeResponse: {
             id: {
-              step: 0,
+              step: '0',
               selected: ['taskID']
             },
             name: {
-              step: 0,
+              step: '0',
               selected: ['body->name']
             },
             position: {
-              step: 1,
+              step: '1',
               selected: ['0->vehicle', '0->location', '0->point']
             }
           }
@@ -116,15 +116,15 @@ test('主流程测试', async () => {
           beforeResponse: {
             data: {
               vehicle: {
-                step: 1,
+                step: '1',
                 selected: ['0->vehicle']
               },
               location: {
-                step: 1,
+                step: '1',
                 selected: ['0->location']
               },
               point: {
-                step: 1,
+                step: '1',
                 selected: ['0->point']
               }
             },

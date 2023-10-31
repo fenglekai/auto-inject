@@ -17,7 +17,8 @@ export interface writeParams {
 interface selectedResponse {
   [value: string]: {
     step: number
-    selected?: Array<string>
+    // ['0->selected', 'body->select']
+    selected: Array<string>
   }
 }
 
