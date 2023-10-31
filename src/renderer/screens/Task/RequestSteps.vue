@@ -325,18 +325,20 @@ const handleTestLink = async () => {
         <v-col cols="auto">
           <v-select
             v-model="item.value.step"
+            :rules="[baseFormRule]"
             :items="selectStepList"
             :disabled="item.stepSelect"
             :loading="item.stepLoading"
             label="选择步骤"
             variant="underlined"
-            style="min-width: 80px"
+            style="min-width: 100px"
             @update:model-value="(value: any) => handleSelectStep(value, index)"
           ></v-select>
         </v-col>
         <v-col cols="auto">
           <v-select
             v-model="item.value.selected"
+            :rules="[baseFormRule]"
             :items="item.stepResList"
             :disabled="item.stepResSelect"
             :loading="item.stepLoading"
@@ -344,7 +346,7 @@ const handleTestLink = async () => {
             label="动态参数值"
             multiple
             variant="underlined"
-            style="min-width: 200px"
+            style="min-width: 180px"
           ></v-select>
         </v-col>
         <v-col cols="auto">

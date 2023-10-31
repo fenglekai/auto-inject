@@ -275,16 +275,16 @@ onUnmounted(() => {
 })
 
 const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) => {
-  const step = toRaw(currentSteps.value[stepKey])
+  const step = toRaw(currentSteps.value)
   let res: any
-  if (step.type === 'request') {
+  if (step[stepKey].type === 'request') {
     const tempTask = {
       taskName: 'tempTask',
-      taskList: [step],
+      taskList: step,
       taskStatus: 0
     }
     try {
-      res = await window.mainApi.apiRequest(tempTask, 0)
+      res = await window.mainApi.apiRequest(tempTask,stepKey)
       return callback(res)
     } catch (error) {
       callback(res)

@@ -39,15 +39,15 @@ const DBTaskTest = async () => {
           beforeResponse: {
             data: {
               vehicle: {
-                step: '1',
+                step: 1,
                 selected: ['0->vehicle']
               },
               location: {
-                step: '1',
+                step: 1,
                 selected: ['0->location']
               },
               point: {
-                step: '1',
+                step: 1,
                 selected: ['0->point']
               }
             },
