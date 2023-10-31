@@ -206,46 +206,44 @@ export class TaskProcess {
     return ip.replace('localhost', '127.0.0.1')
   }
 
-  private getBeforeValue = (beforeData: any, selected: string[] | undefined) => {
+  private getBeforeValue = (beforeData: any, selected: string[]) => {
     let value: any = ''
     let keys: Array<string>
     let index: any
-    if (selected) {
-      if (selected.length === 1) {
-        if (selected[0].includes('->')) {
-          keys = selected[0].split('->')
-          keys.forEach((key) => {
-            if (!index) {
-              index = beforeData[key]
-            } else {
-              index = index[key]
-            }
-          })
-          return index
-        }
-        return beforeData[selected[0]]
+    if (selected.length === 1) {
+      if (selected[0].includes('->')) {
+        keys = selected[0].split('->')
+        keys.forEach((key) => {
+          if (!index) {
+            index = beforeData[key]
+          } else {
+            index = index[key]
+          }
+        })
+        return index
       }
-      for (let i = 0; i < selected.length; i++) {
-        if (selected[i].includes('->')) {
-          keys = selected[i].split('->')
-          index = undefined
-          keys.forEach((key) => {
-            if (!index) {
-              index = beforeData[key]
-            } else {
-              index = index[key]
-            }
-          })
-          value += String(index)
-        } else {
-          value += String(beforeData[selected[i]])
-        }
+      return beforeData[selected[0]]
+    }
+    for (let i = 0; i < selected.length; i++) {
+      if (selected[i].includes('->')) {
+        keys = selected[i].split('->')
+        index = undefined
+        keys.forEach((key) => {
+          if (!index) {
+            index = beforeData[key]
+          } else {
+            index = index[key]
+          }
+        })
+        value += String(index)
+      } else {
+        value += String(beforeData[selected[i]])
       }
     }
     return value
   }
 
-  private apiRequest = async (mainTask: resParams, taskKey: number) => {
+  apiRequest = async (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
     try {
       currentTask.status = 1
@@ -272,6 +270,9 @@ export class TaskProcess {
       if (useResponse) {
         for (const key in beforeResponse) {
           const { step, selected } = beforeResponse[key]
+          if (!step || !selected.length) {
+            throw Error('搜索过去步骤不存在')
+          }
           if (method === 'GET') {
             config.params[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
           } else {

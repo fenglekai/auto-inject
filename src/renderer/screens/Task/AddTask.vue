@@ -95,7 +95,7 @@ const useTemplate = () => {
 }
 
 const selectedStep = ref('监听ModbusTCP值变化')
-const steps = ['监听ModbusTCP值变化', '调用接口', 'ModbusTCP写入值']
+const steps = ['监听ModbusTCP值变化', '调用接口', 'ModbusTCP写入值', 'mongoDB操作']
 const currentSteps = ref<Array<taskListParams>>([])
 const handleAddSteps = () => {
   if (selectedStep.value === '监听ModbusTCP值变化') {
@@ -143,10 +143,27 @@ const handleAddSteps = () => {
       resultData: {}
     })
   }
+  if (selectedStep.value === 'mongoDB操作') {
+    currentSteps.value.push({
+      type: 'MongoDBOperation',
+      status: 0,
+      data: {
+        url: 'localhost:27017',
+        method: 'findDB',
+        DBName: 'auto_inject',
+        tabName: 'vehicle_tray',
+        data: {},
+        setData: {},
+        useResponse: false,
+        beforeResponse: {}
+      },
+      resultData: {}
+    })
+  }
 }
 const watchStep = (value: { key: number; step: Array<readParams> | apiParams | writeParams }) => {
   const { key, step } = value
-  currentSteps.value[key].data = step
+  currentSteps.value[key].data = { ...currentSteps.value[key].data, ...step }
 }
 
 const handleDeleteSteps = (key: number) => {
@@ -219,6 +236,68 @@ const handleEditTask = async () => {
     form.value.reset()
   }, 200)
 }
+
+const taskStepMoveAndRemove = computed(() => {
+  let flag = false
+  currentSteps.value.forEach((item) => {
+    if (item.type === 'request' || item.type === 'MongoDBOperation') {
+      if ((item.data as apiParams).useResponse) {
+        flag = true
+      }
+    }
+  })
+  return flag
+})
+
+const dynamicDialog = ref(false)
+const waitTipShow = ref(false)
+let timer: any
+const useDynamicConfirm = () => {
+  if (!waitTipShow.value) {
+    waitTipShow.value = true
+    dynamicDialog.value = false
+    timer = setTimeout(() => {
+      waitTipShow.value = false
+    }, 5 * 60 * 1000)
+  }
+}
+
+const setUseResponse = async (step: number, status: boolean) => {
+  if (!waitTipShow.value) {
+    dynamicDialog.value = true
+  }
+  const data = currentSteps.value[step].data as apiParams
+  data.useResponse = status
+}
+
+onUnmounted(() => {
+  clearTimeout(timer)
+})
+
+const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) => {
+  const step = toRaw(currentSteps.value[stepKey])
+  let res: any
+  if (step.type === 'request') {
+    const tempTask = {
+      taskName: 'tempTask',
+      taskList: [step],
+      taskStatus: 0
+    }
+    try {
+      res = await window.mainApi.apiRequest(tempTask, 0)
+      return callback(res)
+    } catch (error) {
+      callback(res)
+      return ctx.proxy.$snackbar({
+        message: error
+      })
+    }
+  }
+  callback(res)
+  return ctx.proxy.$snackbar({
+    message: '步骤不存在返回'
+  })
+}
 </script>
 
 <template>
@@ -259,13 +338,14 @@ const handleEditTask = async () => {
       <v-divider></v-divider>
       <v-card-text>
         <v-form ref="form" @submit.prevent>
-          <template v-for="(item, index) in currentSteps" :key="index + JSON.stringify(item.data)">
+          <template v-for="(item, index) in currentSteps" :key="'step' + String(index)">
             <v-card class="pa-4 mb-2" variant="outlined">
               <v-row justify="end">
                 <v-col cols="auto">
-                  <v-tooltip text="上移步骤" location="top">
+                  <v-tooltip text="上移步骤" location="top" :disabled="taskStepMoveAndRemove">
                     <template #activator="{ props: tipProps }">
                       <v-btn
+                        :disabled="taskStepMoveAndRemove"
                         v-bind="tipProps"
                         density="compact"
                         icon="mdi-chevron-up"
@@ -275,9 +355,10 @@ const handleEditTask = async () => {
                   </v-tooltip>
                 </v-col>
                 <v-col cols="auto">
-                  <v-tooltip text="下移步骤" location="top">
+                  <v-tooltip text="下移步骤" location="top" :disabled="taskStepMoveAndRemove">
                     <template #activator="{ props: tipProps }">
                       <v-btn
+                        :disabled="taskStepMoveAndRemove"
                         v-bind="tipProps"
                         density="compact"
                         icon="mdi-chevron-down"
@@ -286,10 +367,14 @@ const handleEditTask = async () => {
                     </template>
                   </v-tooltip>
                 </v-col>
-                <v-col cols="auto">
+                <v-col
+                  cols="auto"
+                  :disabled="taskStepMoveAndRemove && currentSteps.length - 1 !== index"
+                >
                   <v-tooltip text="删除步骤" location="top">
                     <template #activator="{ props: tipProps }">
                       <v-btn
+                        :disabled="taskStepMoveAndRemove && currentSteps.length - 1 !== index"
                         v-bind="tipProps"
                         density="compact"
                         icon="mdi-close"
@@ -300,6 +385,7 @@ const handleEditTask = async () => {
                   </v-tooltip>
                 </v-col>
               </v-row>
+
               <ReadSteps
                 v-if="item.type === 'readModbus'"
                 :item-key="index"
@@ -311,6 +397,8 @@ const handleEditTask = async () => {
                 :item-key="index"
                 :current-step="(currentSteps[index].data as apiParams)"
                 @watch-step="watchStep"
+                @set-use-response="setUseResponse"
+                @fetch-step-response="fetchStepResponse"
               />
               <WriteSteps
                 v-if="item.type === 'writeModbus'"
@@ -338,5 +426,19 @@ const handleEditTask = async () => {
         >
       </v-card-actions>
     </v-card>
+
+    <v-dialog v-model="dynamicDialog" persistent width="auto">
+      <v-card>
+        <v-card-title class="text-h5"> 你确认添加动态参数吗？ </v-card-title>
+        <v-card-text
+          >添加后将无法移动和删除步骤，在删除所有动态步骤后生效（该消息5分钟不再提醒）</v-card-text
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green-darken-1" variant="text" @click="dynamicDialog = false"> 取消 </v-btn>
+          <v-btn color="green-darken-1" variant="text" @click="useDynamicConfirm"> 确认 </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-dialog>
 </template>
