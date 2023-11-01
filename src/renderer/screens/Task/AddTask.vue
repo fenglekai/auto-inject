@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import {} from 'vue'
-import { resParams, readParams, apiParams, writeParams, taskListParams } from '@/types'
+import { resParams, readParams, apiParams, writeParams, taskListParams, DBParams } from '@/types'
 import ReadSteps from './ReadSteps.vue'
 import RequestSteps from './RequestSteps.vue'
 import WriteSteps from './WriteSteps.vue'
+import MongoDBOperationSteps from './MongoDBOperationSteps.vue'
 
 const props = defineProps({
   disabled: {
@@ -152,7 +153,7 @@ const handleAddSteps = () => {
         method: 'findDB',
         DBName: 'auto_inject',
         tabName: 'vehicle_tray',
-        data: {},
+        data: {key: 'value'},
         setData: {},
         useResponse: false,
         beforeResponse: {}
@@ -192,6 +193,9 @@ const handleMoveDownSteps = (key: number) => {
   currentSteps.value[key] = currentDownItem
 }
 
+/**
+ * 新增操作
+ */
 const handleAddTask = async () => {
   const { valid } = await form.value.validate()
   if (!valid) return
@@ -219,7 +223,9 @@ const handleAddTask = async () => {
     form.value.reset()
   }, 200)
 }
-
+/**
+ * 修改操作
+ */
 const handleEditTask = async () => {
   const { valid } = await form.value.validate()
   if (!valid) return
@@ -232,7 +238,6 @@ const handleEditTask = async () => {
   for (const key in currentSteps.value) {
     toRawList[props.editKey].taskList.push(toRaw(currentSteps.value[key]))
   }
-  console.log(toRawList)
   await window.mainApi.setStore('task', [...toRawList])
   emits('complete', true)
   dialog.value = false
@@ -282,14 +287,25 @@ onUnmounted(() => {
 const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) => {
   const step = toRaw(currentSteps.value)
   let res: any
-  if (step[stepKey].type === 'request') {
-    const tempTask = {
+  const tempTask = {
       taskName: 'tempTask',
       taskList: step,
       taskStatus: 0
     }
+  if (step[stepKey].type === 'request') {
     try {
       res = await window.mainApi.apiRequest(tempTask, stepKey)
+      return callback(res)
+    } catch (error) {
+      callback(res)
+      return ctx.proxy.$snackbar({
+        message: error
+      })
+    }
+  }
+  if (step[stepKey].type === 'MongoDBOperation') {
+    try {
+      res = await window.mainApi.mongoDBOperation(tempTask, stepKey)
       return callback(res)
     } catch (error) {
       callback(res)
@@ -406,10 +422,18 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
                 @fetch-step-response="fetchStepResponse"
               />
               <WriteSteps
-                v-if="item.type === 'writeModbus'"
+              v-if="item.type === 'writeModbus'"
+              :item-key="index"
+              :current-step="(currentSteps[index].data as writeParams)"
+              @watch-step="watchStep"
+              />
+              <MongoDBOperationSteps
+                v-if="item.type === 'MongoDBOperation'"
                 :item-key="index"
-                :current-step="(currentSteps[index].data as writeParams)"
+                :current-step="(currentSteps[index].data as DBParams)"
                 @watch-step="watchStep"
+                @set-use-response="setUseResponse"
+                @fetch-step-response="fetchStepResponse"
               />
             </v-card>
           </template>

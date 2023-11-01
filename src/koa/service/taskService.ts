@@ -311,7 +311,7 @@ export class TaskProcess {
     }
   }
 
-  private DBOperations = async (mainTask: resParams, taskKey: number) => {
+  DBOperations = async (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
     try {
       currentTask.status = 1

@@ -56,3 +56,14 @@ export interface resParams {
   taskList: Array<taskListParams>
   taskStatus: 0 | 1 | 2 | 3 // 0: 未执行 1: 执行中 2: 执行成功 3: 执行失败
 }
+
+export type dynamicListParams = Array<{
+  name: string
+  value: { step: string | null; selected: any }
+  stepSelect: boolean
+  stepLoading: boolean
+  stepResSelect: boolean
+  stepResList: Array<string>
+}>
+
+export type listParams = Array<{ name: string; value: string | number; type: 'number' | 'string' }>
