@@ -324,13 +324,21 @@ export class TaskProcess {
       if (useResponse) {
         for (const key in beforeResponse.data) {
           const { step, selected } = beforeResponse.data[key]
+          if (!step || !selected.length) {
+            throw Error('搜索过去步骤不存在')
+          }
           useData[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
         }
         for (const key in beforeResponse.setData) {
           const { step, selected } = beforeResponse.setData[key]
+          if (!step || !selected.length) {
+            throw Error('搜索过去步骤不存在')
+          }
           useSetData[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
         }
       }
+      console.log(useData);
+      console.log(method);
       let res: any
       if (method === 'findDB') {
         res = await client.find(DBName, tabName, useData)

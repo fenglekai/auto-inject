@@ -24,11 +24,15 @@ const ctx: any = getCurrentInstance()
 onMounted(() => {
   for (const key in props.currentStep.data) {
     const type = typeof props.currentStep.data[key] === 'number' ? 'number' : 'string'
-    params.value.push({ name: key, value: props.currentStep.data[key], type })
+    const value =
+      type === 'number' ? String(props.currentStep.data[key]) : props.currentStep.data[key]
+    params.value.push({ name: key, value, type })
   }
   for (const key in props.currentStep.setData) {
     const type = typeof props.currentStep.setData[key] === 'number' ? 'number' : 'string'
-    updateParams.value.push({ name: key, value: props.currentStep.setData[key], type })
+    const value =
+      type === 'number' ? String(props.currentStep.setData[key]) : props.currentStep.setData[key]
+    updateParams.value.push({ name: key, value, type })
   }
   const beforeResponse = props.currentStep.beforeResponse
   const useBefore: dynamicListParams = []

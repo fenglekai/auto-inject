@@ -295,6 +295,7 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
   if (step[stepKey].type === 'request') {
     try {
       res = await window.mainApi.apiRequest(tempTask, stepKey)
+      currentSteps.value[stepKey].resultData = res
       return callback(res)
     } catch (error) {
       callback(res)
@@ -306,6 +307,7 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
   if (step[stepKey].type === 'MongoDBOperation') {
     try {
       res = await window.mainApi.mongoDBOperation(tempTask, stepKey)
+      currentSteps.value[stepKey].resultData = res
       return callback(res)
     } catch (error) {
       callback(res)
