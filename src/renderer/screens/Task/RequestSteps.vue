@@ -3,6 +3,7 @@ import request from '@/renderer/utils/axios'
 import { apiParams, selectedResponse } from '@/types'
 import { AxiosRequestConfig } from 'axios'
 import {} from 'vue'
+import { baseFormRule } from './formRule'
 
 type dynamicListParams = Array<{
   name: string
@@ -52,10 +53,6 @@ onMounted(() => {
   dynamicParams.value = setData
 })
 
-const baseFormRule = (value: any) => {
-  if (!value) return '这是必填项'
-  return true
-}
 const selectedMethod = ref(props.currentStep.method)
 const method = ['GET', 'POST']
 const url = ref(props.currentStep.url)
