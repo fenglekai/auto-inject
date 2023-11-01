@@ -11,7 +11,7 @@ const props = defineProps({
     }
   },
   currentStep: {
-    type: Array<readParams>,
+    type: Object as PropType<Array<readParams> | any>,
     require: true,
     default() {
       return []
@@ -22,7 +22,8 @@ const emits = defineEmits(['watchStep'])
 
 const readForm = ref<Array<readParams>>(props.currentStep)
 watch(readForm.value, (curVal) => {
-  emits('watchStep', { key: props.itemKey, step: curVal })
+  const toRawValue = toRaw(curVal)
+  emits('watchStep', { key: props.itemKey, step: toRawValue })
 })
 
 const baseFormRule = (value: any) => {

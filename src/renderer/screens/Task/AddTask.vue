@@ -163,7 +163,11 @@ const handleAddSteps = () => {
 }
 const watchStep = (value: { key: number; step: Array<readParams> | apiParams | writeParams }) => {
   const { key, step } = value
-  currentSteps.value[key].data = { ...currentSteps.value[key].data, ...step }
+  if (step instanceof Array) {
+    currentSteps.value[key].data = [...step]
+  } else {
+    currentSteps.value[key].data = { ...currentSteps.value[key].data, ...step }
+  }
 }
 
 const handleDeleteSteps = (key: number) => {
@@ -228,6 +232,7 @@ const handleEditTask = async () => {
   for (const key in currentSteps.value) {
     toRawList[props.editKey].taskList.push(toRaw(currentSteps.value[key]))
   }
+  console.log(toRawList)
   await window.mainApi.setStore('task', [...toRawList])
   emits('complete', true)
   dialog.value = false
@@ -284,7 +289,7 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
       taskStatus: 0
     }
     try {
-      res = await window.mainApi.apiRequest(tempTask,stepKey)
+      res = await window.mainApi.apiRequest(tempTask, stepKey)
       return callback(res)
     } catch (error) {
       callback(res)
