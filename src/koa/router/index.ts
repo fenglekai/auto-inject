@@ -10,7 +10,13 @@ router.get('/', (ctx, next) => {
   ctx.body = 'This is the Koa server'
 })
 router.get('/test', async (ctx) => {
-  ctx.body = ctx.request.query
+  const promise = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true)
+      ctx.body = ctx.request.query
+    }, 1000)
+  })
+  await promise
 })
 router.post('/test', async (ctx) => {
   const promise = new Promise((resolve) => {
