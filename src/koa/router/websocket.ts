@@ -6,7 +6,16 @@ import { resParams } from '../../types'
 let io: Server
 
 export let currentTaskList: Array<resParams>
-export const taskProcessList: any = {}
+export const taskProcessList: { [taskName: string]: TaskProcess } = {}
+
+export const initProcess = async () => {
+  currentTaskList = await useStoreGet('task')
+  for (let i = 0; i < currentTaskList.length; i++) {
+    if (!taskProcessList[currentTaskList[i].taskName]) {
+      taskProcessList[currentTaskList[i].taskName] = new TaskProcess()
+    }
+  }
+}
 
 export const createWebSocket = async (httpServer: any) => {
   io = new Server(httpServer, {
@@ -15,14 +24,6 @@ export const createWebSocket = async (httpServer: any) => {
     }
   })
   currentTaskList = await useStoreGet('task')
-
-  const initProcess = () => {
-    for (let i = 0; i < currentTaskList.length; i++) {
-      if (!taskProcessList[currentTaskList[i].taskName]) {
-        taskProcessList[currentTaskList[i].taskName] = new TaskProcess()
-      }
-    }
-  }
   initProcess()
 
   io.on('connection', async (socket) => {
@@ -60,7 +61,6 @@ export const createWebSocket = async (httpServer: any) => {
     let taskTimer: any
     socket.on('task', async (tag) => {
       if (tag === 'update') {
-        currentTaskList = await useStoreGet('task')
         initProcess()
       }
 

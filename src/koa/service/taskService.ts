@@ -6,11 +6,15 @@ export class TaskProcess {
   private processTaskStatus: boolean
   private abortController: AbortController | null
   private waitNextTimer: any
+  private errorStatus: boolean
   private errorStep: number
+  private postStatus: boolean
   constructor() {
     this.processTaskStatus = false
     this.abortController = null
+    this.errorStatus = false
     this.errorStep = 0
+    this.postStatus = false
   }
 
   taskStart = async (mainTask: resParams, stepKey = 0) => {
@@ -42,6 +46,14 @@ export class TaskProcess {
             res = await this.DBOperations(mainTask, taskKey)
             break
 
+          case 'waitPost':
+            res = await this.waitPost(mainTask, taskKey)
+            break
+
+          case 'postCallback':
+            res = this.postCallback(mainTask, taskKey)
+            break
+
           default:
             break
         }
@@ -55,6 +67,7 @@ export class TaskProcess {
       } else {
         console.error(error)
         mainTask.taskStatus = 3
+        this.errorStatus = true
         this.errorStep = taskKey
       }
     }
@@ -63,6 +76,7 @@ export class TaskProcess {
   taskRetry = (mainTask: resParams) => {
     if (mainTask.taskStatus === 3) {
       mainTask.taskStatus = 1
+      this.errorStatus = false
       this.taskStart(mainTask, this.errorStep)
     }
   }
@@ -127,6 +141,13 @@ export class TaskProcess {
     }, 3 * 1000)
   }
 
+  /**
+   * modbus读取步骤
+   * @param mainTask
+   * @param taskKey
+   * @param isNextTicker
+   * @returns
+   */
   private modbusRead = async (
     mainTask: resParams,
     taskKey: number,
@@ -243,6 +264,12 @@ export class TaskProcess {
     return value
   }
 
+  /**
+   * api请求步骤
+   * @param mainTask
+   * @param taskKey
+   * @returns
+   */
   apiRequest = async (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
     try {
@@ -295,6 +322,12 @@ export class TaskProcess {
     }
   }
 
+  /**
+   * modbus写入步骤
+   * @param mainTask
+   * @param taskKey
+   * @returns
+   */
   private modbusWrite = async (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
     try {
@@ -311,6 +344,12 @@ export class TaskProcess {
     }
   }
 
+  /**
+   * mongoDB操作步骤
+   * @param mainTask
+   * @param taskKey
+   * @returns
+   */
   DBOperations = async (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
     try {
@@ -337,8 +376,6 @@ export class TaskProcess {
           useSetData[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
         }
       }
-      console.log(useData);
-      console.log(method);
       let res: any
       if (method === 'findDB') {
         res = await client.find(DBName, tabName, useData)
@@ -360,4 +397,55 @@ export class TaskProcess {
       return Promise.reject(Error('MongoDBOperations error: ' + error))
     }
   }
+
+  /**
+   * 等待接口调用步骤
+   * @returns
+   */
+  private waitPost = (mainTask: resParams, taskKey: number) =>
+    new Promise((resolve, reject) => {
+      const currentTask = mainTask.taskList[taskKey]
+      currentTask.status = 1
+      const loop = () => {
+        if (!this.processTaskStatus) {
+          currentTask.status = 0
+          return reject(Error('任务已终止'))
+        }
+        if (this.postStatus) {
+          currentTask.status = 2
+          return resolve(true)
+        }
+        setTimeout(() => {
+          loop()
+        }, 1000)
+      }
+      loop()
+    })
+
+  /**
+   * 接口完成返回用步骤
+   * @returns
+   */
+  private postCallback = (mainTask: resParams, taskKey: number) => {
+    const currentTask = mainTask.taskList[taskKey]
+    currentTask.status = 2
+    this.postStatus = false
+    return true
+  }
+
+  executePost = () =>
+    new Promise((resolve, reject) => {
+      this.postStatus = true
+      const loop = () => {
+        if (this.errorStatus === false) {
+          if (this.postStatus === false) return resolve(true)
+        } else {
+          return reject(Error('executePost error: 任务报错'))
+        }
+        setTimeout(() => {
+          loop()
+        }, 1000)
+      }
+      loop()
+    })
 }
