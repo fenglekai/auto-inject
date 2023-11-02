@@ -46,12 +46,12 @@ export class TaskProcess {
             res = await this.DBOperations(mainTask, taskKey)
             break
 
-          case 'waitPost':
-            res = await this.waitPost(mainTask, taskKey)
+          case 'waitApi':
+            res = await this.waitApi(mainTask, taskKey)
             break
 
-          case 'postCallback':
-            res = this.postCallback(mainTask, taskKey)
+          case 'apiCallback':
+            res = this.apiCallback(mainTask, taskKey)
             break
 
           default:
@@ -402,7 +402,7 @@ export class TaskProcess {
    * 等待接口调用步骤
    * @returns
    */
-  private waitPost = (mainTask: resParams, taskKey: number) =>
+  private waitApi = (mainTask: resParams, taskKey: number) =>
     new Promise((resolve, reject) => {
       const currentTask = mainTask.taskList[taskKey]
       currentTask.status = 1
@@ -426,21 +426,21 @@ export class TaskProcess {
    * 接口完成返回用步骤
    * @returns
    */
-  private postCallback = (mainTask: resParams, taskKey: number) => {
+  private apiCallback = (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
     currentTask.status = 2
     this.postStatus = false
     return true
   }
 
-  executePost = () =>
+  executeApi = () =>
     new Promise((resolve, reject) => {
       this.postStatus = true
       const loop = () => {
         if (this.errorStatus === false) {
           if (this.postStatus === false) return resolve(true)
         } else {
-          return reject(Error('executePost error: 任务报错'))
+          return reject(Error('executeApi error: 任务报错'))
         }
         setTimeout(() => {
           loop()

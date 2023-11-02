@@ -212,7 +212,7 @@ test('公共接口调用流程测试', async () => {
     taskName: 'Task_5',
     taskList: [
       {
-        type: 'waitPost',
+        type: 'waitApi',
         status: 0,
         data: {},
         resultData: {}
@@ -230,7 +230,7 @@ test('公共接口调用流程测试', async () => {
         resultData: {}
       },
       {
-        type: 'postCallback',
+        type: 'apiCallback',
         status: 0,
         data: {},
         resultData: {}
@@ -240,7 +240,7 @@ test('公共接口调用流程测试', async () => {
   }
   const task = new TaskProcess()
   setTimeout(async () => {
-    const res = await task.executePost()
+    const res = await task.executeApi()
     console.log('post:' + res)
   }, 5000)
   await task.taskStart(example)
