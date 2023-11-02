@@ -437,6 +437,7 @@ export class TaskProcess {
     new Promise((resolve, reject) => {
       this.postStatus = true
       const loop = () => {
+        if (!this.processTaskStatus) throw Error('任务没有运行')
         if (this.errorStatus === false) {
           if (this.postStatus === false) return resolve(true)
         } else {

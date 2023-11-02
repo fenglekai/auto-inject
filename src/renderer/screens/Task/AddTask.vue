@@ -96,70 +96,103 @@ const useTemplate = () => {
 }
 
 const selectedStep = ref('监听ModbusTCP值变化')
-const steps = ['监听ModbusTCP值变化', '调用接口', 'ModbusTCP写入值', 'mongoDB操作']
+const steps = [
+  '监听ModbusTCP值变化',
+  '调用接口',
+  'ModbusTCP写入值',
+  'mongoDB操作',
+  '等待接口调用',
+  '完成接口返回'
+]
 const currentSteps = ref<Array<taskListParams>>([])
 const handleAddSteps = () => {
-  if (selectedStep.value === '监听ModbusTCP值变化') {
-    currentSteps.value.push({
-      type: 'readModbus',
-      status: 0,
-      data: [
-        {
+  switch (selectedStep.value) {
+    case '监听ModbusTCP值变化':
+      currentSteps.value.push({
+        type: 'readModbus',
+        status: 0,
+        data: [
+          {
+            ip: 'localhost',
+            port: '8888',
+            readAddress: '5',
+            readValue: '1',
+            watchValue: null,
+            method: 'readCoils'
+          }
+        ],
+        resultData: {}
+      })
+      break
+
+    case '调用接口':
+      currentSteps.value.push({
+        type: 'request',
+        status: 0,
+        data: {
+          method: 'GET',
+          url: 'http://localhost:3000/test',
+          data: [{ name: 'key', value: 'value' }],
+          useResponse: false,
+          beforeResponse: {}
+        },
+        resultData: {}
+      })
+      break
+
+    case 'ModbusTCP写入值':
+      currentSteps.value.push({
+        type: 'writeModbus',
+        status: 0,
+        data: {
           ip: 'localhost',
           port: '8888',
-          readAddress: '5',
-          readValue: '1',
-          watchValue: null,
-          method: 'readCoils'
-        }
-      ],
-      resultData: {}
-    })
-  }
-  if (selectedStep.value === '调用接口') {
-    currentSteps.value.push({
-      type: 'request',
-      status: 0,
-      data: {
-        method: 'GET',
-        url: 'http://localhost:3000/test',
-        data: [{ name: 'key', value: 'value' }],
-        useResponse: false,
-        beforeResponse: {}
-      },
-      resultData: {}
-    })
-  }
-  if (selectedStep.value === 'ModbusTCP写入值') {
-    currentSteps.value.push({
-      type: 'writeModbus',
-      status: 0,
-      data: {
-        ip: 'localhost',
-        port: '8888',
-        writeAddress: '5',
-        writeValue: '1',
-        method: 'writeSingleCoil'
-      },
-      resultData: {}
-    })
-  }
-  if (selectedStep.value === 'mongoDB操作') {
-    currentSteps.value.push({
-      type: 'MongoDBOperation',
-      status: 0,
-      data: {
-        url: 'localhost:27017',
-        method: 'findDB',
-        DBName: 'auto_inject',
-        tabName: 'vehicle_tray',
-        data: { key: 'value' },
-        setData: {},
-        useResponse: false,
-        beforeResponse: {}
-      },
-      resultData: {}
-    })
+          writeAddress: '5',
+          writeValue: '1',
+          method: 'writeSingleCoil'
+        },
+        resultData: {}
+      })
+      break
+
+    case 'mongoDB操作':
+      currentSteps.value.push({
+        type: 'MongoDBOperation',
+        status: 0,
+        data: {
+          url: 'localhost:27017',
+          method: 'findDB',
+          DBName: 'auto_inject',
+          tabName: 'vehicle_tray',
+          data: { key: 'value' },
+          setData: {},
+          useResponse: false,
+          beforeResponse: {}
+        },
+        resultData: {}
+      })
+      break
+
+    case '等待接口调用':
+      currentSteps.value.push({
+        type: 'waitApi',
+        status: 0,
+        data: {},
+        resultData: {}
+      })
+      break
+
+    case '完成接口返回':
+      currentSteps.value.push({
+        type: 'apiCallback',
+        status: 0,
+        data: {},
+        resultData: {}
+      })
+      break
+
+    default:
+      break
   }
 }
 const watchStep = (value: { key: number; step: Array<readParams> | apiParams | writeParams }) => {
@@ -437,6 +470,12 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
                 @set-use-response="setUseResponse"
                 @fetch-step-response="fetchStepResponse"
               />
+              <div v-if="item.type === 'waitApi'">
+                Step{{ index + 1 }}: 等待接口调用
+              </div>
+              <div v-if="item.type === 'apiCallback'">
+                Step{{ index + 1 }}: 完成接口返回
+              </div>
             </v-card>
           </template>
         </v-form>
@@ -462,7 +501,7 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
       <v-card>
         <v-card-title class="text-h5"> 你确认添加动态参数吗？ </v-card-title>
         <v-card-text
-          >添加后将无法移动和删除步骤，在删除所有动态步骤后生效（该消息5分钟不再提醒）</v-card-text
+          >添加后将无法移动和删除步骤，在删除所有动态步骤后生效（该消息5分钟内不再提醒）</v-card-text
         >
         <v-card-actions>
           <v-spacer></v-spacer>
