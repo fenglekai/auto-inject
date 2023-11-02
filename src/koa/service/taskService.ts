@@ -83,6 +83,8 @@ export class TaskProcess {
 
   taskStop = (mainTask: resParams) => {
     this.processTaskStatus = false
+    this.postStatus = false
+    this.errorStatus = false
     this.abortController?.abort()
     this.resetTask(mainTask)
   }
