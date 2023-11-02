@@ -7,7 +7,7 @@ defineProps({
     type: String,
     require: true,
     default() {
-      return "params"
+      return 'params'
     }
   },
   params: {

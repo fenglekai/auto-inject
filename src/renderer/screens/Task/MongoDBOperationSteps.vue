@@ -227,10 +227,10 @@ const collectionParams = computed(() => {
   return { data, setData, beforeResponse }
 })
 watch(DBForm, (curVal) => {
-  const { data, beforeResponse } = collectionParams.value
+  const { data, setData, beforeResponse } = collectionParams.value
   emits('watchStep', {
     key: props.itemKey,
-    step: { ...curVal, data, beforeResponse }
+    step: { ...curVal, data, setData, beforeResponse }
   })
 })
 watch(
@@ -250,10 +250,13 @@ const handleTestLink = async () => {
   try {
     const res = await window.mainApi.mongoConnect(DBForm.url)
     ctx.proxy.$snackbar({
-      message: '调用成功,返回:' + res
+      message: '连接成功,返回:' + res
     })
   } catch (error) {
     console.error(error)
+    ctx.proxy.$snackbar({
+      message: '连接失败:' + error
+    })
   }
 }
 </script>

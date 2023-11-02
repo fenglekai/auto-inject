@@ -43,7 +43,10 @@ onMounted(() => {
   for (const key in beforeResponse) {
     setData.push({
       name: key,
-      value: { step: (beforeResponse[key].step + 1).toString(), selected: beforeResponse[key].selected },
+      value: {
+        step: (beforeResponse[key].step + 1).toString(),
+        selected: beforeResponse[key].selected
+      },
       stepSelect: false,
       stepLoading: false,
       stepResSelect: true,
@@ -231,6 +234,9 @@ const handleTestLink = async () => {
     })
   } catch (error) {
     console.error(error)
+    ctx.proxy.$snackbar({
+      message: '调用失败:' + error
+    })
   }
 }
 </script>

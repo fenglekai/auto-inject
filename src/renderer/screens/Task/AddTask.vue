@@ -153,7 +153,7 @@ const handleAddSteps = () => {
         method: 'findDB',
         DBName: 'auto_inject',
         tabName: 'vehicle_tray',
-        data: {key: 'value'},
+        data: { key: 'value' },
         setData: {},
         useResponse: false,
         beforeResponse: {}
@@ -288,10 +288,10 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
   const step = toRaw(currentSteps.value)
   let res: any
   const tempTask = {
-      taskName: 'tempTask',
-      taskList: step,
-      taskStatus: 0
-    }
+    taskName: 'tempTask',
+    taskList: step,
+    taskStatus: 0
+  }
   if (step[stepKey].type === 'request') {
     try {
       res = await window.mainApi.apiRequest(tempTask, stepKey)
@@ -424,10 +424,10 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
                 @fetch-step-response="fetchStepResponse"
               />
               <WriteSteps
-              v-if="item.type === 'writeModbus'"
-              :item-key="index"
-              :current-step="(currentSteps[index].data as writeParams)"
-              @watch-step="watchStep"
+                v-if="item.type === 'writeModbus'"
+                :item-key="index"
+                :current-step="(currentSteps[index].data as writeParams)"
+                @watch-step="watchStep"
               />
               <MongoDBOperationSteps
                 v-if="item.type === 'MongoDBOperation'"
