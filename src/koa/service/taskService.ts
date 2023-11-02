@@ -297,7 +297,7 @@ export class TaskProcess {
       if (useResponse) {
         for (const key in beforeResponse) {
           const { step, selected } = beforeResponse[key]
-          if (!step || !selected.length) {
+          if (step == null || selected.length === 0) {
             throw Error('搜索过去步骤不存在')
           }
           if (method === 'GET') {
@@ -361,16 +361,17 @@ export class TaskProcess {
       const useData = { ...data }
       const useSetData = { ...setData }
       if (useResponse) {
+        console.log(beforeResponse.data);
         for (const key in beforeResponse.data) {
           const { step, selected } = beforeResponse.data[key]
-          if (!step || !selected.length) {
+          if (step == null || selected.length === 0) {
             throw Error('搜索过去步骤不存在')
           }
           useData[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
         }
         for (const key in beforeResponse.setData) {
           const { step, selected } = beforeResponse.setData[key]
-          if (!step || !selected.length) {
+          if (step == null || selected.length === 0) {
             throw Error('搜索过去步骤不存在')
           }
           useSetData[key] = this.getBeforeValue(mainTask.taskList[step].resultData, selected)
