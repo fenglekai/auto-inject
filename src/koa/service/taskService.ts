@@ -428,6 +428,10 @@ export class TaskProcess {
    */
   private apiCallback = (mainTask: resParams, taskKey: number) => {
     const currentTask = mainTask.taskList[taskKey]
+    if (!this.processTaskStatus) {
+      currentTask.status = 0
+      throw Error('任务已终止')
+    }
     currentTask.status = 2
     this.postStatus = false
     return true
@@ -437,7 +441,7 @@ export class TaskProcess {
     new Promise((resolve, reject) => {
       this.postStatus = true
       const loop = () => {
-        if (!this.processTaskStatus) throw Error('任务没有运行')
+        if (!this.processTaskStatus) throw Error('任务已终止')
         if (this.errorStatus === false) {
           if (this.postStatus === false) return resolve(true)
         } else {
