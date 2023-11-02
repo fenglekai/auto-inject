@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { readParams } from '@/types'
 import {} from 'vue'
+import { baseFormRule, numberFormRule } from './formRule'
 
 const props = defineProps({
   itemKey: {
@@ -11,7 +12,7 @@ const props = defineProps({
     }
   },
   currentStep: {
-    type: Array<readParams>,
+    type: Object as PropType<Array<readParams> | any>,
     require: true,
     default() {
       return []
@@ -22,17 +23,10 @@ const emits = defineEmits(['watchStep'])
 
 const readForm = ref<Array<readParams>>(props.currentStep)
 watch(readForm.value, (curVal) => {
-  emits('watchStep', { key: props.itemKey, step: curVal })
+  const toRawValue = toRaw(curVal)
+  emits('watchStep', { key: props.itemKey, step: toRawValue })
 })
 
-const baseFormRule = (value: any) => {
-  if (!value) return '这是必填项'
-  return true
-}
-const numberFormRule = (value: any) => {
-  if (/[^0-9]/.test(value)) return '请输入数字'
-  return true
-}
 const readMethods = [
   'readCoils',
   'readDiscreteInputs',

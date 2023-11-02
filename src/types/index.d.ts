@@ -14,16 +14,41 @@ export interface writeParams {
   method: 'writeSingleCoil' | 'writeSingleRegister'
 }
 
+interface selectedResponse {
+  [value: string]: {
+    step: number
+    // ['0->selected', 'body->select']
+    selected: Array<string>
+  }
+}
+
 export interface apiParams {
   method: string
   url: string
   data: any
+  useResponse: boolean
+  beforeResponse: selectedResponse
+}
+
+export interface DBParams {
+  url: string
+  method: 'findDB' | 'updateDB' | 'removeDB' | 'insertDB'
+  DBName: string
+  tabName: string
+  data: any
+  setData: any
+  useResponse: boolean
+  beforeResponse: {
+    data: selectedResponse
+    setData?: selectedResponse
+  }
 }
 
 export interface taskListParams {
-  type: 'readModbus' | 'request' | 'writeModbus'
-  data: Array<readParams> | apiParams | writeParams
+  type: 'readModbus' | 'request' | 'writeModbus' | 'MongoDBOperation' | 'waitApi' | 'apiCallback'
+  data: Array<readParams> | apiParams | writeParams | DBParams | {}
   status: 0 | 1 | 2 | 3 // 0: 未执行 1: 执行中 2: 执行成功 3: 执行失败
+  resultData: any
 }
 
 export interface resParams {
@@ -31,3 +56,14 @@ export interface resParams {
   taskList: Array<taskListParams>
   taskStatus: 0 | 1 | 2 | 3 // 0: 未执行 1: 执行中 2: 执行成功 3: 执行失败
 }
+
+export type dynamicListParams = Array<{
+  name: string
+  value: { step: string | null; selected: any }
+  stepSelect: boolean
+  stepLoading: boolean
+  stepResSelect: boolean
+  stepResList: Array<string>
+}>
+
+export type listParams = Array<{ name: string; value: string | number; type: 'number' | 'string' }>

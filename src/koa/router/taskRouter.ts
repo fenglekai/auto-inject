@@ -59,4 +59,17 @@ router.get('/stop', async (ctx) => {
   }
 })
 
+router.get('/taskConfirm', async (ctx) => {
+  try {
+    const taskName = ctx.request.query.taskName
+    if (typeof taskName !== 'string') throw Error('taskName is not a string')
+    if (taskProcessList[taskName] == null) throw Error('The task does not exist')
+    await taskProcessList[taskName].executeApi()
+    ctx.body = true
+  } catch (error) {
+    ctx.status = 500
+    ctx.body = { message: String(error) }
+  }
+})
+
 export default router.routes()

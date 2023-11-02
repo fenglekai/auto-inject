@@ -1,6 +1,7 @@
-import { Page, _electron as electron } from 'playwright'
-import { ElectronApplication } from 'playwright-core'
+import { ElectronApplication, Page, _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
+import { TaskProcess } from '../src/koa/service/taskService'
+import { resParams } from '../src/types'
 
 let appWindow: Page
 let appElectron: ElectronApplication
@@ -37,20 +38,215 @@ test('Environment check', async () => {
 })
 
 test('Document element check', async () => {
-  await isElementVisible('.v-toolbar__content')
-  await isElementVisible('#main-logo')
-  await isElementVisible('#select-language')
+  await isElementVisible('.subheading')
 })
 
-test('Counter button click check', async () => {
-  await appWindow.click('#btn-counter', { clickCount: 10, delay: 50 })
+// test('主流程测试', async () => {
+//   const example: resParams = {
+//     taskName: 'Task_1',
+//     taskList: [
+//       {
+//         type: 'request',
+//         status: 0,
+//         data: {
+//           method: 'POST',
+//           url: 'http://localhost:3000/test',
+//           data: '{ "taskID": "0001", "body": { "name": "Task" } }',
+//           useResponse: false,
+//           beforeResponse: {}
+//         },
+//         resultData: {}
+//       },
+//       {
+//         type: 'MongoDBOperation',
+//         status: 0,
+//         data: {
+//           url: 'localhost:27017',
+//           method: 'findDB',
+//           DBName: 'auto_inject',
+//           tabName: 'vehicle_tray',
+//           data: { status: 0 },
+//           setData: {},
+//           useResponse: false,
+//           beforeResponse: {
+//             data: {},
+//             setData: {}
+//           }
+//         },
+//         resultData: {}
+//       },
+//       {
+//         type: 'request',
+//         status: 0,
+//         data: {
+//           method: 'POST',
+//           url: 'http://localhost:3000/test',
+//           data: '{}',
+//           useResponse: true,
+//           beforeResponse: {
+//             id: {
+//               step: 0,
+//               selected: ['taskID']
+//             },
+//             name: {
+//               step: 0,
+//               selected: ['body->name']
+//             },
+//             position: {
+//               step: 1,
+//               selected: ['0->vehicle', '0->location', '0->point']
+//             }
+//           }
+//         },
+//         resultData: {}
+//       },
+//       {
+//         type: 'MongoDBOperation',
+//         status: 0,
+//         data: {
+//           url: 'localhost:27017',
+//           method: 'updateDB',
+//           DBName: 'auto_inject',
+//           tabName: 'vehicle_tray',
+//           data: {},
+//           setData: {
+//             status: 1
+//           },
+//           useResponse: true,
+//           beforeResponse: {
+//             data: {
+//               vehicle: {
+//                 step: 1,
+//                 selected: ['0->vehicle']
+//               },
+//               location: {
+//                 step: 1,
+//                 selected: ['0->location']
+//               },
+//               point: {
+//                 step: 1,
+//                 selected: ['0->point']
+//               }
+//             },
+//             setData: {}
+//           }
+//         },
+//         resultData: {}
+//       }
+//     ],
+//     taskStatus: 0
+//   }
+//   const task = new TaskProcess()
+//   await task.taskStart(example)
+//   console.log(example)
+//   for (let i = 0; i < example.taskList.length; i++) {
+//     expect(example.taskList[i].status, '效验步骤是否成功').toBe(2)
+//   }
+// })
 
-  const counterValueElement = await appWindow.$('#counter-badge .v-badge__badge')
-
-  expect(
-    await appWindow.evaluate((element) => element.innerHTML, counterValueElement),
-    'Confirm counter value is same'
-  ).toBe('10')
+// test('DB流程测试', async () => {
+//   const example: resParams = {
+//     taskName: 'Task_5',
+//     taskList: [
+//       {
+//         type: 'MongoDBOperation',
+//         status: 0,
+//         data: {
+//           url: 'localhost:27017',
+//           method: 'findDB',
+//           DBName: 'auto_inject',
+//           tabName: 'vehicle_tray',
+//           data: { status: 0 },
+//           setData: {},
+//           useResponse: false,
+//           beforeResponse: {
+//             data: {},
+//             setData: {}
+//           }
+//         },
+//         resultData: {}
+//       },
+//       {
+//         type: 'MongoDBOperation',
+//         status: 0,
+//         data: {
+//           url: 'localhost:27017',
+//           method: 'updateDB',
+//           DBName: 'auto_inject',
+//           tabName: 'vehicle_tray',
+//           data: {},
+//           setData: {
+//             status: 1
+//           },
+//           useResponse: true,
+//           beforeResponse: {
+//             data: {
+//               vehicle: {
+//                 step: 0,
+//                 selected: ['0->vehicle']
+//               },
+//               location: {
+//                 step: 0,
+//                 selected: ['0->location']
+//               },
+//               point: {
+//                 step: 0,
+//                 selected: ['0->point']
+//               }
+//             },
+//             setData: {}
+//           }
+//         },
+//         resultData: {}
+//       }
+//     ],
+//     taskStatus: 0
+//   }
+//   const task = new TaskProcess()
+//   await task.taskStart(example)
+//   expect(example.taskList[0].status, '效验步骤是否成功').toBe(2)
+//   console.log(example)
+// })
+test('公共接口调用流程测试', async () => {
+  const example: resParams = {
+    taskName: 'Task_5',
+    taskList: [
+      {
+        type: 'waitApi',
+        status: 0,
+        data: {},
+        resultData: {}
+      },
+      {
+        type: 'request',
+        status: 0,
+        data: {
+          method: 'POST',
+          url: 'http://localhost:3000/test',
+          data: '{ "taskID": "0001", "body": { "name": "Task" } }',
+          useResponse: false,
+          beforeResponse: {}
+        },
+        resultData: {}
+      },
+      {
+        type: 'apiCallback',
+        status: 0,
+        data: {},
+        resultData: {}
+      }
+    ],
+    taskStatus: 0
+  }
+  const task = new TaskProcess()
+  setTimeout(async () => {
+    const res = await task.executeApi()
+    console.log('post:' + res)
+  }, 5000)
+  await task.taskStart(example)
+  for (let i = 0; i < example.taskList.length; i++) {
+    expect(example.taskList[i].status, '效验步骤是否成功').toBe(2)
+  }
 })
 
 test.afterAll(async () => {

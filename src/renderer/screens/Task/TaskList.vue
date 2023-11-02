@@ -279,7 +279,7 @@ const handleResetData = async () => {
                   <template #activator="{ props }">
                     <v-btn
                       :disabled="main.taskStatus !== 3"
-                      color="red"
+                      color="primary"
                       icon="mdi-reload"
                       size="small"
                       class="ml-2"
@@ -374,6 +374,10 @@ const handleResetData = async () => {
                         </p>
                       </v-card>
                     </v-col>
+                    <template v-if="task.status === 2">
+                      <v-divider class="mt-2"></v-divider>
+                      result: {{ task.resultData }}
+                    </template>
                   </v-row>
                   <div v-if="task.type === 'request'">
                     调用接口:
@@ -383,6 +387,10 @@ const handleResetData = async () => {
                     <v-chip class="ms-0" color="blue" label size="small">
                       {{ (task.data as apiParams).url }}
                     </v-chip>
+                    <template v-if="task.status === 2">
+                      <v-divider class="mt-2"></v-divider>
+                      result: {{ task.resultData }}
+                    </template>
                   </div>
                   <div v-if="task.type === 'writeModbus'">
                     <v-chip color="blue" label size="small">
@@ -399,6 +407,29 @@ const handleResetData = async () => {
                     <v-chip class="ms-0" label size="small">
                       {{ (task.data as writeParams).writeValue }}
                     </v-chip>
+                    <template v-if="task.status === 2">
+                      <v-divider class="mt-2"></v-divider>
+                      result: {{ task.resultData }}
+                    </template>
+                  </div>
+                  <div v-if="task.type === 'MongoDBOperation'">
+                    mongoDB操作:
+                    <v-chip class="ms-0 mr-2" color="blue" label size="small">
+                      {{ (task.data as apiParams).url }}
+                    </v-chip>
+                    <v-chip class="ms-0 mr-2" color="orange-darken-3" label size="small">
+                      {{ (task.data as apiParams).method }}
+                    </v-chip>
+                    <template v-if="task.status === 2">
+                      <v-divider class="mt-2"></v-divider>
+                      result: {{ task.resultData }}
+                    </template>
+                  </div>
+                  <div v-if="task.type === 'waitApi'">
+                    等待接口调用
+                  </div>
+                  <div v-if="task.type === 'apiCallback'">
+                    完成接口返回
                   </div>
                 </v-timeline-item>
               </template>

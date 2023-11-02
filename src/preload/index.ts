@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import { resParams } from '../types'
 
 // Whitelist of valid channels used for IPC communication (Send message from Renderer to Main)
 const mainAvailChannels: string[] = ['msgRequestGetVersion', 'msgOpenExternalLink']
@@ -29,7 +30,12 @@ contextBridge.exposeInMainWorld('mainApi', {
   getStore: (key: string) => ipcRenderer.invoke('store:getStore', key),
   setStore: (key: string, value: any) => ipcRenderer.invoke('store:setStore', key, value),
   logFile: () => ipcRenderer.invoke('log:logFile'),
-  openPath: () => ipcRenderer.invoke('log:openPath')
+  openPath: () => ipcRenderer.invoke('log:openPath'),
+  apiRequest: (mainTask: resParams, taskKey: number) =>
+    ipcRenderer.invoke('server:apiRequest', mainTask, taskKey),
+  mongoDBOperation: (mainTask: resParams, taskKey: number) =>
+    ipcRenderer.invoke('server:mongoDBOperation', mainTask, taskKey),
+  mongoConnect: (url: string) => ipcRenderer.invoke('server:mongoConnect', url)
 })
 
 contextBridge.exposeInMainWorld('APIServer', {

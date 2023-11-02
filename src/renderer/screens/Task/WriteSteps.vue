@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { writeParams } from '@/types'
 import {} from 'vue'
+import { baseFormRule, numberFormRule } from './formRule'
 
 const props = defineProps({
   itemKey: {
@@ -25,14 +26,6 @@ watch(writeForm.value, (curVal) => {
   emits('watchStep', { key: props.itemKey, step: curVal })
 })
 
-const baseFormRule = (value: any) => {
-  if (!value) return '这是必填项'
-  return true
-}
-const numberFormRule = (value: any) => {
-  if (/[^0-9]/.test(value)) return '请输入数字'
-  return true
-}
 const writeMethods = ['writeSingleCoil', 'writeSingleRegister']
 </script>
 
