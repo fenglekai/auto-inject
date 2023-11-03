@@ -32,7 +32,7 @@ ModbusTCP 可视化图形界面连接工具。提供读写操作 api 接口；�
    - 监听 modbus 值状态
    - 调用接口（POST、GET）
    - 写入 modbus 值
-   - mongoDB操作
+   - mongoDB 操作
    - 等待接口调用
    - 完成接口返回
 4. 自定义任务流程步骤提供高扩展性任务
