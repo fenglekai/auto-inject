@@ -425,12 +425,8 @@ const handleResetData = async () => {
                       result: {{ task.resultData }}
                     </template>
                   </div>
-                  <div v-if="task.type === 'waitApi'">
-                    等待接口调用
-                  </div>
-                  <div v-if="task.type === 'apiCallback'">
-                    完成接口返回
-                  </div>
+                  <div v-if="task.type === 'waitApi'"> 等待接口调用 </div>
+                  <div v-if="task.type === 'apiCallback'"> 完成接口返回 </div>
                 </v-timeline-item>
               </template>
             </v-timeline>

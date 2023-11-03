@@ -363,7 +363,6 @@ export class TaskProcess {
       const useData = { ...data }
       const useSetData = { ...setData }
       if (useResponse) {
-        console.log(beforeResponse.data);
         for (const key in beforeResponse.data) {
           const { step, selected } = beforeResponse.data[key]
           if (step == null || selected.length === 0) {
