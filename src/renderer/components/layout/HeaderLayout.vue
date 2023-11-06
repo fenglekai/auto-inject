@@ -1,6 +1,8 @@
 <script setup lang="ts">
+const windowMaxSize = ref(false)
 const windowMax = () => {
   window.mainApi.send('windowMax')
+  windowMaxSize.value = !windowMaxSize.value
 }
 const windowMin = () => {
   window.mainApi.send('windowMin')
@@ -18,8 +20,8 @@ const windowClose = () => {
           <v-icon>mdi-window-minimize</v-icon>
         </v-btn>
       <v-btn icon @click="windowMax">
-          <v-icon>mdi-window-maximize</v-icon>
-          <!-- <v-icon>mdi-window-restore</v-icon> -->
+          <v-icon v-if="!windowMaxSize">mdi-window-maximize</v-icon>
+          <v-icon v-else>mdi-window-restore</v-icon>
         </v-btn>
       <v-btn icon @click="windowClose">
           <v-icon>mdi-window-close</v-icon>
