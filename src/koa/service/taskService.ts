@@ -9,12 +9,16 @@ export class TaskProcess {
   private errorStatus: boolean
   private errorStep: number
   private postStatus: boolean
+  private modbusClient: Array<ModbusClient>
+  private mongoDBClient: MongoDBClient
   constructor() {
     this.processTaskStatus = false
     this.abortController = null
     this.errorStatus = false
     this.errorStep = 0
     this.postStatus = false
+    this.modbusClient = []
+    this.mongoDBClient = new MongoDBClient('localhost:27017')
   }
 
   taskStart = async (mainTask: resParams, stepKey = 0) => {
@@ -61,7 +65,7 @@ export class TaskProcess {
       }
       this.taskWaitNext(mainTask)
     } catch (error) {
-      if (String(error).includes('任务已终止')) {
+      if (!this.processTaskStatus) {
         console.log(`${mainTask.taskName} 任务已终止`)
         this.resetTask(mainTask)
       } else {
@@ -86,6 +90,9 @@ export class TaskProcess {
     this.postStatus = false
     this.errorStatus = false
     this.abortController?.abort()
+    if (this.mongoDBClient.connected) {
+      this.mongoDBClient.disconnect()
+    }
     this.resetTask(mainTask)
   }
 
@@ -132,7 +139,7 @@ export class TaskProcess {
         }
         this.taskStart(mainTask)
       } catch (error) {
-        if (String(error).includes('任务已终止')) {
+        if (!this.processTaskStatus) {
           console.log(`${mainTask.taskName} 任务已终止`)
           this.resetTask(mainTask)
         } else {
@@ -159,14 +166,15 @@ export class TaskProcess {
     const currentTask = mainTask.taskList[taskKey]
     try {
       currentTask.status = 1
+      this.modbusClient.length = 0
       const passList = new Array((currentTask.data as readParams[]).length).fill(false)
       const promise: Promise<any> = new Promise((resolve, reject) => {
         for (let i = 0; i < (currentTask.data as readParams[]).length; i++) {
           const { ip, port, readAddress, readValue, method } = (
             currentTask.data as Array<readParams>
           )[i]
-          const client = new ModbusClient()
-          client
+          this.modbusClient[i] = new ModbusClient()
+          this.modbusClient[i]
             .modbusConnect({ ip, port: Number(port) })
             .then(() => {
               const loop = async () => {
@@ -177,7 +185,7 @@ export class TaskProcess {
                   return reject(Error('任务已终止'))
                 }
                 try {
-                  const data = await client.readRegisters(method, Number(readAddress), 1)
+                  const data = await this.modbusClient[i].readRegisters(method, Number(readAddress), 1)
                   const currentValue = data.response.body.valuesAsArray[0]
                   currentTask.data[i].watchValue = currentValue
                   // 判断等待重置状态
@@ -216,6 +224,9 @@ export class TaskProcess {
       const result = await promise
       return result
     } catch (error) {
+      if (!this.processTaskStatus) {
+        return Promise.reject(Error('任务已终止'))
+      }
       for (const key in readTimer) {
         clearTimeout(readTimer[key])
       }
@@ -334,8 +345,10 @@ export class TaskProcess {
     const currentTask = mainTask.taskList[taskKey]
     try {
       currentTask.status = 1
+      this.modbusClient.length = 0
       const { ip, port, method, writeAddress, writeValue } = currentTask.data as writeParams
       const client = new ModbusClient()
+      this.modbusClient.push(client)
       await client.modbusConnect({ ip, port: Number(port) })
       await client.writeRegister(method, Number(writeAddress), Number(writeValue))
       currentTask.status = 2
@@ -358,8 +371,8 @@ export class TaskProcess {
       currentTask.status = 1
       const { url, method, DBName, tabName, data, setData, useResponse, beforeResponse } =
         currentTask.data as DBParams
-      const client = new MongoDBClient(url)
-      await client.connect()
+      this.mongoDBClient = new MongoDBClient(url)
+      await this.mongoDBClient.connect()
       const useData = { ...data }
       const useSetData = { ...setData }
       if (useResponse) {
@@ -380,21 +393,24 @@ export class TaskProcess {
       }
       let res: any
       if (method === 'findDB') {
-        res = await client.find(DBName, tabName, useData)
+        res = await this.mongoDBClient.find(DBName, tabName, useData)
       }
       if (method === 'updateDB') {
-        res = await client.update(DBName, tabName, useData, useSetData)
+        res = await this.mongoDBClient.update(DBName, tabName, useData, useSetData)
       }
       if (method === 'removeDB') {
-        res = await client.remove(DBName, tabName, useData)
+        res = await this.mongoDBClient.remove(DBName, tabName, useData)
       }
       if (method === 'insertDB') {
-        res = await client.insert(DBName, tabName, useData)
+        res = await this.mongoDBClient.insert(DBName, tabName, useData)
       }
       currentTask.status = 2
-      await client.disconnect()
+      await this.mongoDBClient.disconnect()
       return res
     } catch (error: any) {
+      if (!this.processTaskStatus) {
+        return Promise.reject(Error('任务已终止'))
+      }
       currentTask.status = 3
       return Promise.reject(Error('MongoDBOperations error: ' + error))
     }

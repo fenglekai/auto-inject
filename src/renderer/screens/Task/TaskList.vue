@@ -275,7 +275,7 @@ const handleResetData = async () => {
                     ></v-btn>
                   </template>
                 </v-tooltip>
-                <v-tooltip :disabled="!main.taskStatus" text="重试" location="bottom">
+                <v-tooltip :disabled="main.taskStatus !== 3" text="重试" location="bottom">
                   <template #activator="{ props }">
                     <v-btn
                       :disabled="main.taskStatus !== 3"

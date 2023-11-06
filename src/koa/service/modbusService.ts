@@ -37,7 +37,6 @@ class ModbusClient {
         if (!this.client) return
         this.client.socket.end()
         this.client = null
-        socket.end()
       })
 
       this.client.socket.on('connect', async () => {
@@ -48,7 +47,6 @@ class ModbusClient {
         if (!this.client) return
         this.client.socket.end()
         this.client = null
-        socket.end()
       })
       this.client.socket.connect(options)
     })
