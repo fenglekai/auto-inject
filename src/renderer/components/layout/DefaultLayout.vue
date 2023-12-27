@@ -2,9 +2,10 @@
 
 <template>
   <v-app>
-    <v-layout>
+    <v-layout full-height>
+      <HeaderLayout />
       <AsideLayout />
-      <v-main>
+      <v-main style="max-height: 100vh; overflow-y: scroll;">
         <slot />
       </v-main>
     </v-layout>

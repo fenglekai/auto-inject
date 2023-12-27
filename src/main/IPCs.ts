@@ -20,6 +20,22 @@ export default class IPCs {
       await shell.openExternal(url)
     })
 
+    ipcMain.on('windowMax', () => {
+      if(window.isMaximized()) {
+         window.restore()
+      }else{
+        window.maximize()
+      }
+    })
+
+    ipcMain.on('windowMin', function () {
+        window.minimize();
+    })
+
+    ipcMain.on('windowClose', function () {
+        window.close();
+    })
+
     ipcMain.handle('api:openServer', init)
     ipcMain.handle('api:closeServer', close)
     ipcMain.handle('api:serverStatus', status)
