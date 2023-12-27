@@ -3,6 +3,7 @@ import { DefaultLayout } from '@/renderer/components/layout'
 </script>
 
 <template>
+  <!-- <div>1</div> -->
   <DefaultLayout>
     <router-view />
   </DefaultLayout>

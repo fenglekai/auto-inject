@@ -59,6 +59,11 @@ watch(
   () => props.editKey,
   (curVal) => {
     if (curVal >= 0) {
+      // for (const key in props.mainList[curVal].taskList) {
+      //   setTimeout(() => {
+      //     currentSteps.value.push(props.mainList[curVal].taskList[key])
+      //   }, 200);
+      // }
       currentSteps.value = props.mainList[curVal].taskList
     }
   }
@@ -357,7 +362,7 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
 </script>
 
 <template>
-  <v-dialog v-model="dialog" scrollable width="900">
+  <v-dialog v-model="dialog" scrollable persistent fullscreen transition="dialog-bottom-transition">
     <template #activator="{ props: wrapperProps }">
       <v-btn
         color="primary"
@@ -368,7 +373,13 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
       ></v-btn>
     </template>
     <v-card>
-      <v-card-title>创建流程步骤</v-card-title>
+      <v-toolbar dark color="primary">
+        <v-toolbar-title>创建流程步骤</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon dark @click="dialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-toolbar>
       <v-card-subtitle>
         <v-row justify="end" align="center" class="my-1">
           <v-col cols="auto">
@@ -442,40 +453,38 @@ const fetchStepResponse = async (stepKey: number, callback: (data: any) => any) 
                 </v-col>
               </v-row>
 
-              <ReadSteps
-                v-if="item.type === 'readModbus'"
-                :item-key="index"
-                :current-step="(currentSteps[index].data as Array<readParams>)"
-                @watch-step="watchStep"
-              />
-              <RequestSteps
-                v-if="item.type === 'request'"
-                :item-key="index"
-                :current-step="(currentSteps[index].data as apiParams)"
-                @watch-step="watchStep"
-                @set-use-response="setUseResponse"
-                @fetch-step-response="fetchStepResponse"
-              />
-              <WriteSteps
-                v-if="item.type === 'writeModbus'"
-                :item-key="index"
-                :current-step="(currentSteps[index].data as writeParams)"
-                @watch-step="watchStep"
-              />
-              <MongoDBOperationSteps
-                v-if="item.type === 'MongoDBOperation'"
-                :item-key="index"
-                :current-step="(currentSteps[index].data as DBParams)"
-                @watch-step="watchStep"
-                @set-use-response="setUseResponse"
-                @fetch-step-response="fetchStepResponse"
-              />
-              <div v-if="item.type === 'waitApi'">
-                Step{{ index + 1 }}: 等待接口调用
-              </div>
-              <div v-if="item.type === 'apiCallback'">
-                Step{{ index + 1 }}: 完成接口返回
-              </div>
+              <v-lazy :min-height="100" :options="{ threshold: 0.5 }" transition="fade-transition">
+                <ReadSteps
+                  v-if="item.type === 'readModbus'"
+                  :item-key="index"
+                  :current-step="(currentSteps[index].data as Array<readParams>)"
+                  @watch-step="watchStep"
+                />
+                <RequestSteps
+                  v-if="item.type === 'request'"
+                  :item-key="index"
+                  :current-step="(currentSteps[index].data as apiParams)"
+                  @watch-step="watchStep"
+                  @set-use-response="setUseResponse"
+                  @fetch-step-response="fetchStepResponse"
+                />
+                <WriteSteps
+                  v-if="item.type === 'writeModbus'"
+                  :item-key="index"
+                  :current-step="(currentSteps[index].data as writeParams)"
+                  @watch-step="watchStep"
+                />
+                <MongoDBOperationSteps
+                  v-if="item.type === 'MongoDBOperation'"
+                  :item-key="index"
+                  :current-step="(currentSteps[index].data as DBParams)"
+                  @watch-step="watchStep"
+                  @set-use-response="setUseResponse"
+                  @fetch-step-response="fetchStepResponse"
+                />
+                <div v-if="item.type === 'waitApi'"> Step{{ index + 1 }}: 等待接口调用 </div>
+                <div v-if="item.type === 'apiCallback'"> Step{{ index + 1 }}: 完成接口返回 </div>
+              </v-lazy>
             </v-card>
           </template>
         </v-form>

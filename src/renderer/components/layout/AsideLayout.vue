@@ -19,11 +19,6 @@ const dialog = ref(false)
 
 <template>
   <v-navigation-drawer v-model="drawer" expand-on-hover rail permanent @click="rail = false">
-    <v-list-item title="Auto Inject" nav>
-      <template #prepend>
-        <v-icon icon="mdi-home-city" class="ma-2" color="light-blue" />
-      </template>
-    </v-list-item>
     <div class="pa-2">
       <v-btn block color="green-accent-3" class="mb-2" @click="dialog = true">
         <v-icon icon="mdi-spider-thread" />

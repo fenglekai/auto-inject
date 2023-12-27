@@ -4,9 +4,11 @@ const mongodb = require('mongodb')
 export class MongoDBClient {
   client: MongoClient | null
   mongoUrl: string
+  connected: boolean
   constructor(url: string) {
     this.client = null
     this.mongoUrl = `mongodb://${this.localhostReplace(url)}`
+    this.connected = false
   }
 
   private localhostReplace = (ip: string) => {
@@ -16,15 +18,16 @@ export class MongoDBClient {
   connect = async () => {
     // Connection URL
     this.client = new mongodb.MongoClient(this.mongoUrl)
-
     // Use connect method to connect to the server
     await this.client?.connect()
+    this.connected = true
     return 'Connected successfully to mongo server'
   }
 
   disconnect = async () => {
     if (this.client) {
       await this.client.close()
+      this.connected = false
       return 'Successfully disconnected from mongo server'
     }
     throw Error('Client is not connected')

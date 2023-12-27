@@ -1,18 +1,12 @@
-<div align="center">
-
-![vutron-logo](src/renderer/public/images/vutron-logo.webp)
-
-Quick Start Templates for **[Vite](https://vitejs.dev)** + **[Vue 3](https://vuejs.org)** + **[Electron](https://www.electronjs.org)**
-
-**Vutron** is a preconfigured template for developing `Electron` cross-platform desktop apps. It uses `Vue 3` and allows you to build a fast development environment with little effort.
-
-</div>
-
 # AutoInject
 
 ModbusTCP 可视化图形界面连接工具。提供读写操作 api 接口；创建自定义流程任务。
 
 [**接口文档**](./docs/接口说明.md)
+
+## 界面预览
+
+![录屏_auto-inject_20231107083710](https://gitee.com/feng-lekai/blog-image/raw/master/img/%E5%BD%95%E5%B1%8F_auto-inject_20231107083710.gif)
 
 ## 技术栈
 
@@ -31,7 +25,10 @@ ModbusTCP 可视化图形界面连接工具。提供读写操作 api 接口；�
 3. 流程任务模块
    - 监听 modbus 值状态
    - 调用接口（POST、GET）
-   - 写入 modbus 值步骤
+   - 写入 modbus 值
+   - mongoDB 操作
+   - 等待接口调用
+   - 完成接口返回
 4. 自定义任务流程步骤提供高扩展性任务
 5. 任务流程步骤可动态调整，封装单独步骤流程
 6. 日志输出
@@ -40,10 +37,8 @@ ModbusTCP 可视化图形界面连接工具。提供读写操作 api 接口；�
 
 ## 将来实现
 
-1. 添加调用 token 接口并储存到任务缓存步骤
-2. 添加传入数据接口
-3. 添加监控传入数据步骤
-4. 优化任务步骤与 modbusTCP 与 mongoDB 频繁连接问题
+1. 优化任务步骤与 modbusTCP 与 mongoDB 频繁连接问题
+2. 重置条件设置（目前默认完成任务等待三秒后开始执行监控任务中“监听 modbus 值状态”任务的值是否为“非监听值”，然后重新开始任务）
 
 ## 快速开始
 

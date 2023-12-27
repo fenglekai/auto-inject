@@ -275,7 +275,7 @@ const handleResetData = async () => {
                     ></v-btn>
                   </template>
                 </v-tooltip>
-                <v-tooltip :disabled="!main.taskStatus" text="重试" location="bottom">
+                <v-tooltip :disabled="main.taskStatus !== 3" text="重试" location="bottom">
                   <template #activator="{ props }">
                     <v-btn
                       :disabled="main.taskStatus !== 3"
@@ -425,12 +425,8 @@ const handleResetData = async () => {
                       result: {{ task.resultData }}
                     </template>
                   </div>
-                  <div v-if="task.type === 'waitApi'">
-                    等待接口调用
-                  </div>
-                  <div v-if="task.type === 'apiCallback'">
-                    完成接口返回
-                  </div>
+                  <div v-if="task.type === 'waitApi'"> 等待接口调用 </div>
+                  <div v-if="task.type === 'apiCallback'"> 完成接口返回 </div>
                 </v-timeline-item>
               </template>
             </v-timeline>

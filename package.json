@@ -1,6 +1,6 @@
 {
   "name": "auto-inject",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Custom workflow client.",
   "homepage": "https://vutron.jooy2.com",
   "author": "fenglekai<fenglekai@gmail.com>",
@@ -14,7 +14,7 @@
     ]
   },
   "scripts": {
-    "dev": "ELECTRON_ENABLE_LOGGING=true vite",
+    "dev": "cross-env ELECTRON_ENABLE_LOGGING=true vite",
     "dev:debug": "vite -d",
     "dev:debug:force": "vite -d --force",
     "dev:server": "nodemon ./src/koa/index.ts",
@@ -39,6 +39,7 @@
   "dependencies": {
     "@koa/router": "^12.0.0",
     "axios": "0.27.2",
+    "cross-env": "^7.0.3",
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "jsmodbus": "^4.0.6",
