@@ -6,7 +6,7 @@ ModbusTCP 可视化图形界面连接工具。提供读写操作 api 接口；�
 
 ## 界面预览
 
-![录屏_auto-inject_20231107083710](https://gitee.com/feng-lekai/blog-image/raw/master/img/%E5%BD%95%E5%B1%8F_auto-inject_20231107083710.gif)
+![录屏_auto-inject_20231107083710](https://raw.githubusercontent.com/fenglekai/image-bed/master/img%E5%BD%95%E5%B1%8F_auto-inject_20231107083710.gif)
 
 ## 技术栈
 
