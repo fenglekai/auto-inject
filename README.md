@@ -1,18 +1,12 @@
-<div align="center">
-
-![vutron-logo](src/renderer/public/images/vutron-logo.webp)
-
-Quick Start Templates for **[Vite](https://vitejs.dev)** + **[Vue 3](https://vuejs.org)** + **[Electron](https://www.electronjs.org)**
-
-**Vutron** is a preconfigured template for developing `Electron` cross-platform desktop apps. It uses `Vue 3` and allows you to build a fast development environment with little effort.
-
-</div>
-
 # AutoInject
 
 ModbusTCP 可视化图形界面连接工具。提供读写操作 api 接口；创建自定义流程任务。
 
 [**接口文档**](./docs/接口说明.md)
+
+## 界面预览
+
+![录屏_auto-inject_20231107083710](https://gitee.com/feng-lekai/blog-image/raw/master/img/%E5%BD%95%E5%B1%8F_auto-inject_20231107083710.gif)
 
 ## 技术栈
 
