@@ -3,7 +3,7 @@ name: ci
 on: [push]
 
 jobs:
-  windows:
+  eletron:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,8 +15,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '16'
+      
+      - name: Get version
+        id: package
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const package = require('./package.json')
+            return package.version
+
+      - name: Output version
+        run: echo "The version is ${{ steps.package.outputs.result }}"
           
       - name: Build
-        run: pwd
-      - run: ls
+        run: 
+          npm install
+          npm run build:win
+          npm run build:linux
 
+      - name: Upload to Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_name: ${{ format('{0}', github.repository) }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: 
+            release/${{ steps.package.outputs.result }}/*.deb
+            release/${{ steps.package.outputs.result }}/*.exe
+          overwrite: true
