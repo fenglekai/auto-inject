@@ -1,0 +1,22 @@
+name: ci
+
+on: [push]
+
+jobs:
+  windows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          
+      - name: Build
+        run: pwd
+      - run: ls
+
