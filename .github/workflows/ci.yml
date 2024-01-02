@@ -28,7 +28,7 @@ jobs:
         run: echo "The version is ${{ steps.package.outputs.result }}"
           
       - name: Build
-        run: 
+        run: |
           npm install
           npm run build:win
           npm run build:linux
@@ -39,7 +39,7 @@ jobs:
           repo_name: ${{ format('{0}', github.repository) }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: 
+          file: |
             release/${{ steps.package.outputs.result }}/*.deb
             release/${{ steps.package.outputs.result }}/*.exe
           overwrite: true
