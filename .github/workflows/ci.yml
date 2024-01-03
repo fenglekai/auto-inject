@@ -49,7 +49,7 @@ jobs:
           repo_name: ${{ format('{0}', github.repository) }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: release/**/*.deb
+          file: ${{ github.workspace }}/release/**/*.deb
           overwrite: true
 
   windows:
@@ -98,5 +98,5 @@ jobs:
           repo_name: ${{ format('{0}', github.repository) }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: release/**/*.exe
+          file: ${{ github.workspace }}/release/**/*.exe
           overwrite: true
