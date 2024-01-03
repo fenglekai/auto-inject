@@ -3,7 +3,28 @@ name: ci
 on: [push]
 
 jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version
+        id: package
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const package = require('./package.json')
+            return package.version
+
+      - name: Output version
+        id: version
+        run: | 
+          echo "The version is ${{ steps.package.outputs.result }}"
+          echo "release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
+    outputs:
+      version: ${{ steps.package.outputs.result }}
+      release_tag: ${{ steps.version.outputs.release_tag }}
+    
   eletron:
+    needs: create-tag
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -27,33 +48,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '16'
-      
-      - name: Get version
-        id: package
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const package = require('./package.json')
-            return package.version
-
-      - name: Output version
-        id: version
-        run: | 
-          echo "The version is ${{ steps.package.outputs.result }}"
-          if [ ${{ matrix.os }} == "windows-latest" ]; then
-            echo "set release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
-          else
-            echo "release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
-          fi
 
       - name: Check release tag
-        run: echo "The release_tag is ${{ steps.version.outputs.release_tag }}"
+        run: echo "The release_tag is ${{ needs.create-tag.outputs.release_tag }}"
           
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with: 
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: ${{ steps.package.outputs.result }}
+          release: ${{ needs.create-tag.outputs.version }}
           build_script_name: ${{ matrix.build }}
 
       - name: Check Build
@@ -67,4 +70,4 @@ jobs:
           file_glob: true
           file: ./release/**/*.${{ matrix.suffix }}
           overwrite: true
-          tag: ${{ steps.version.outputs.release_tag }}
+          tag: ${{ needs.create-tag.outputs.release_tag }}
