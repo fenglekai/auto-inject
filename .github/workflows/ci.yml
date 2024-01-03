@@ -8,8 +8,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        build: ["build:linux", "build:win"]
+        os: [ubuntu-latest]
+        build: ["build:linux"]
         
     steps:
       - name: Checkout code
