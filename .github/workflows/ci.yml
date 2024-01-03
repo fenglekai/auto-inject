@@ -50,8 +50,8 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
           file: |
-            release/$VERSION/*.deb
-            release/$VERSION/*.exe
+            release/${{ format('{0}', steps.package.outputs.result) }}/*.deb
+            release/${{ format('{0}', steps.package.outputs.result) }}/*.exe
           overwrite: true
 
   windows:
@@ -101,6 +101,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
           file: |
-            release/$VERSION/*.deb
-            release/$VERSION/*.exe
+            release/${{ format('{0}', steps.package.outputs.result) }}/*.deb
+            release/${{ format('{0}', steps.package.outputs.result) }}/*.exe
           overwrite: true
