@@ -40,7 +40,9 @@ jobs:
         id: version
         run: echo "The version is ${{ steps.package.outputs.result }}"
         env:
-         VERSION: ${{ steps.package.outputs.result }}
+         VERSION: v${{ format(fromJSON('"\\r\\n {0}\\r\\n"'), ${{ steps.package.outputs.result }}) }}
+         
+      - run: ${{ steps.version.env.VERSION }}
           
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
@@ -60,4 +62,4 @@ jobs:
           file_glob: true
           file: ./release/**/*.${{ matrix.suffix }}
           overwrite: true
-          tag: ${{ steps.package.outputs.result }}
+          tag: ${{ steps.version.env.VERSION }}
