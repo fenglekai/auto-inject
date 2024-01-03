@@ -46,6 +46,7 @@ jobs:
             echo "set release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
           else
             echo "release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
+          fi
 
       - name: Check release tag
         run: echo "The release_tag is ${{ steps.version.outputs.release_tag }}"
