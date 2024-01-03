@@ -43,6 +43,11 @@ jobs:
           release: ${{ steps.package.outputs.result }}
           build_script_name: ${{ matrix.build }}
 
+      - name: Checkout Build
+        run: |
+          ls ${{ github.workspace }}
+          ls ${{ github.workspace }}/release
+
       - name: Upload to Release
         uses: svenstaro/upload-release-action@v2
         with:
