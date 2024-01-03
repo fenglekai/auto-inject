@@ -8,7 +8,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         
     steps:
       - name: Checkout code
@@ -37,7 +38,7 @@ jobs:
         with: 
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: ${{ steps.package.outputs.result }}
-          build_script_name: "build"
+          build_script_name: "build:linux"
 
       - name: Upload to Release
         uses: svenstaro/upload-release-action@v2
