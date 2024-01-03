@@ -37,13 +37,13 @@ jobs:
             return package.version
 
       - name: Output version
+        id: version
         run: | 
-          eval echo "The version is ${{ steps.package.outputs.result }}"
-        env: 
-          VERSION: eval echo "v${{ steps.package.outputs.result }}"
+          echo "The version is ${{ steps.package.outputs.result }}"
+          echo "release_tag=${{ steps.package.outputs.result }} >> $GITHUB_OUTPUT"
           
       - name: Check verison
-        run: echo "${VERSION}"
+        run: echo "${{ steps.version.outputs.release_tag }}"
           
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
@@ -63,4 +63,4 @@ jobs:
           file_glob: true
           file: ./release/**/*.${{ matrix.suffix }}
           overwrite: true
-          tag: ${{ env.VERSION }}
+          tag: ${{ steps.version.outputs.release_tag }}
