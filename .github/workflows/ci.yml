@@ -39,10 +39,10 @@ jobs:
         include:
           - os: ubuntu-latest
             build: "build:linux"
-            suffix: (deb|AppImage)
+            suffix: deb
           - os: windows-latest
             build: "build:win"
-            suffix: (exe|zip)
+            suffix: exe
         
     steps:
       - name: Checkout code
