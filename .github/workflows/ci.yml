@@ -40,7 +40,12 @@ jobs:
         id: version
         run: | 
           echo "The version is ${{ steps.package.outputs.result }}"
-          echo "release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
+          uNames=`uname -s`
+          osName=${uNames: 0: 4}
+          if [ "$osName" == "MING" ]; then
+            echo "set release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
+          else
+            echo "release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
 
       - name: Check release tag
         run: echo "The release_tag is ${{ steps.version.outputs.release_tag }}"
