@@ -3,13 +3,64 @@ name: ci
 on: [push]
 
 jobs:
-  eletron:
+  ubuntu:
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
         build: ["build:linux", "build:win"]
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+      
+      - name: Get version
+        id: package
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const package = require('./package.json')
+            return package.version
+
+      - name: Output version
+        id: version
+        run: echo "The version is ${{ steps.package.outputs.result }}"
+        env:
+         VERSION: ${{ steps.package.outputs.result }}
+          
+      - name: Build
+        uses: samuelmeuli/action-electron-builder@v1.6.0
+        with: 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: ${{ steps.package.outputs.result }}
+          build_script_name: ${{ matrix.build }}
+
+      - name: Upload to Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_name: ${{ format('{0}', github.repository) }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: |
+            release/$VERSION/*.deb
+            release/$VERSION/*.exe
+          overwrite: true
+
+  windows:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+        build: ["build:win"]
         
     steps:
       - name: Checkout code
