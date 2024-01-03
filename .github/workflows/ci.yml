@@ -21,6 +21,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '16'
+          
+      - name: Set git branch
+        run: git checkout feature-1.2.0
       
       - name: Get version
         id: package
@@ -44,9 +47,7 @@ jobs:
           build_script_name: ${{ matrix.build }}
 
       - name: Checkout Build
-        run: |
-          ls ${{ github.workspace }}
-          ls ${{ github.workspace }}/release
+        run: ls ${{ github.workspace }}/release
 
       - name: Upload to Release
         uses: svenstaro/upload-release-action@v2
