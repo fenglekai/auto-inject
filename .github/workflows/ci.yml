@@ -41,7 +41,9 @@ jobs:
         run: | 
           echo "The version is ${{ steps.package.outputs.result }}"
           echo "release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '\"')" >> $GITHUB_OUTPUT
-          echo "The release_tag is ${{ steps.version.outputs.release_tag }}"
+
+      - name: Check release tag
+        run: echo "The release_tag is ${{ steps.version.outputs.release_tag }}"
           
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
