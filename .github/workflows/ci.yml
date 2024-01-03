@@ -43,7 +43,7 @@ jobs:
           - os: windows-latest
             build: "build:win"
             suffix: exe
-          - os: macos-13
+          - os: macos-latest
             build: "build:mac"
             suffix: dmg
         
