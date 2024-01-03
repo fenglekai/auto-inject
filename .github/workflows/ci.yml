@@ -16,12 +16,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           show-progress: false
+          ref: feature-1.2.0
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: '16'
-          ref: feature-1.2.0
       
       - name: Get version
         id: package
@@ -69,12 +69,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           show-progress: false
+          ref: feature-1.2.0
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: '16'
-          ref: feature-1.2.0
       
       - name: Get version
         id: package
