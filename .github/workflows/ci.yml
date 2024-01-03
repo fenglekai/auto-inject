@@ -24,9 +24,10 @@ jobs:
         id: version
         run: | 
           echo "The version is ${{ steps.package.outputs.result }}"
+          echo "version=$(echo ${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
           echo "release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
     outputs:
-      version: ${{ steps.package.outputs.result }}
+      version: ${{ steps.version.outputs.version }}
       release_tag: ${{ steps.version.outputs.release_tag }}
     
   eletron:
@@ -62,18 +63,18 @@ jobs:
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with: 
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: ${{ needs.create-tag.outputs.release_tag }}
+          release: ${{ needs.create-tag.outputs.version }}
           build_script_name: ${{ matrix.build }}
 
       - name: Check Build
         run: ls ${{ github.workspace }}/release
 
-      # - name: Upload to Release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_name: ${{ format('{0}', github.repository) }}
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file_glob: true
-      #     file: ./release/**/*.${{ matrix.suffix }}
-      #     overwrite: true
-      #     tag: ${{ needs.create-tag.outputs.release_tag }}
+      - name: Upload to Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_name: ${{ format('{0}', github.repository) }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: release/${{ needs.create-tag.outputs.version }}/*.${{ matrix.suffix }}
+          overwrite: true
+          tag: ${{ needs.create-tag.outputs.release_tag }}
