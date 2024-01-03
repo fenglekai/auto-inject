@@ -62,18 +62,18 @@ jobs:
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with: 
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: ${{ needs.create-tag.outputs.version }}
+          release: ${{ needs.create-tag.outputs.release_tag }}
           build_script_name: ${{ matrix.build }}
 
       - name: Check Build
         run: ls ${{ github.workspace }}/release
 
-      - name: Upload to Release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_name: ${{ format('{0}', github.repository) }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file_glob: true
-          file: ./release/**/*.${{ matrix.suffix }}
-          overwrite: true
-          tag: ${{ needs.create-tag.outputs.release_tag }}
+      # - name: Upload to Release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_name: ${{ format('{0}', github.repository) }}
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file_glob: true
+      #     file: ./release/**/*.${{ matrix.suffix }}
+      #     overwrite: true
+      #     tag: ${{ needs.create-tag.outputs.release_tag }}
