@@ -40,9 +40,7 @@ jobs:
         id: version
         run: | 
           echo "The version is ${{ steps.package.outputs.result }}"
-          uNames=`uname -s`
-          osName=${uNames: 0: 4}
-          if [ "$osName" == "MING" ]; then
+          if [ ${{ matrix.os }} == "windows-latest" ]; then
             echo "set release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
           else
             echo "release_tag=$(echo v${{ steps.package.outputs.result }} | tr -d '"')" >> $GITHUB_OUTPUT
