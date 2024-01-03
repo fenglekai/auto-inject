@@ -37,10 +37,10 @@ jobs:
             return package.version
 
       - name: Output version
-        id: version
         run: | 
           echo "The version is ${{ steps.package.outputs.result }}"
-          echo "The tag_name is ${{ github.event.release.tag_name }}"
+          echo "VERSION=${${{ steps.package.outputs.result }}#"}" >> $VERSION
+          echo "$VERSION"
           
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
