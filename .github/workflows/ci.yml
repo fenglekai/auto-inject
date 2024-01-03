@@ -43,6 +43,9 @@ jobs:
           - os: windows-latest
             build: "build:win"
             suffix: exe
+          - os: macos-13
+            build: "build:mac"
+            suffix: ipa
         
     steps:
       - name: Checkout code
@@ -67,14 +70,13 @@ jobs:
           build_script_name: ${{ matrix.build }}
 
       - name: Check Build
-        run: ls ${{ github.workspace }}/release
+        run: ls ${{ github.workspace }}/release/${{ needs.create-tag.outputs.version }}
 
       - name: Upload to Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_name: ${{ format('{0}', github.repository) }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
           file: release/${{ needs.create-tag.outputs.version }}/*.${{ matrix.suffix }}
-          overwrite: true
           tag: ${{ needs.create-tag.outputs.release_tag }}
+          overwrite: true
