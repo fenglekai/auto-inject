@@ -6,6 +6,12 @@ jobs:
   create-tag:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+          ref: feature-1.2.0
+
       - name: Get version
         id: package
         uses: actions/github-script@v5
