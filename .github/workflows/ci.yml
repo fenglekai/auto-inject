@@ -8,8 +8,8 @@ jobs:
 
     strategy:
       matrix:
-        # os: [macos-latest, ubuntu-latest, windows-latest]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
+        build: [build:linux, build:win]
         
     steps:
       - name: Checkout code
@@ -31,14 +31,17 @@ jobs:
             return package.version
 
       - name: Output version
+        id: version
         run: echo "The version is ${{ steps.package.outputs.result }}"
+        env:
+         VERSION: ${{ steps.package.outputs.result }}
           
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with: 
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: ${{ steps.package.outputs.result }}
-          build_script_name: "build:linux"
+          build_script_name: ${{ matrix.build }}
 
       - name: Upload to Release
         uses: svenstaro/upload-release-action@v2
@@ -47,6 +50,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
           file: |
-            release/${{ steps.package.outputs.result }}/*.deb
-            release/${{ steps.package.outputs.result }}/*.exe
+            release/$VERSION/*.deb
+            release/$VERSION/*.exe
           overwrite: true
