@@ -11,8 +11,10 @@ jobs:
         include:
           - os: ubuntu-latest
             build: "build:linux"
+            suffix: deb
           - os: windows-latest
             build: "build:win"
+            suffix: exe
         
     steps:
       - name: Checkout code
@@ -56,5 +58,5 @@ jobs:
           repo_name: ${{ format('{0}', github.repository) }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: ./release/**/*.deb
+          file: ./release/**/*.${{ matrix.suffix }}
           overwrite: true
