@@ -45,7 +45,7 @@ jobs:
             suffix: exe
           - os: macos-13
             build: "build:mac"
-            suffix: ipa
+            suffix: dmg
         
     steps:
       - name: Checkout code
