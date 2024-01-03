@@ -38,9 +38,12 @@ jobs:
 
       - name: Output version
         run: | 
-          echo "The version is ${{ steps.package.outputs.result }}"
-          echo "VERSION=${${{ steps.package.outputs.result }}#"}" >> $VERSION
-          echo "$VERSION"
+          eval echo "The version is ${{ steps.package.outputs.result }}"
+        env: 
+          VERSION: eval echo "v${{ steps.package.outputs.result }}"
+          
+      - name: Check verison
+        run: echo "${VERSION}"
           
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
@@ -49,7 +52,7 @@ jobs:
           release: ${{ steps.package.outputs.result }}
           build_script_name: ${{ matrix.build }}
 
-      - name: Checkout Build
+      - name: Check Build
         run: ls ${{ github.workspace }}/release
 
       - name: Upload to Release
@@ -60,4 +63,4 @@ jobs:
           file_glob: true
           file: ./release/**/*.${{ matrix.suffix }}
           overwrite: true
-          tag: ${{ steps.version.env.VERSION }}
+          tag: ${{ env.VERSION }}
