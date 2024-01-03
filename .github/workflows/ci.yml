@@ -60,3 +60,4 @@ jobs:
           file_glob: true
           file: ./release/**/*.${{ matrix.suffix }}
           overwrite: true
+          tag: ${{ steps.package.outputs.result }}
