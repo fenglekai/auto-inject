@@ -38,11 +38,9 @@ jobs:
 
       - name: Output version
         id: version
-        run: echo "The version is ${{ steps.package.outputs.result }}"
-        env:
-         VERSION: v${{ format(fromJSON('"\\r\\n {0}\\r\\n"'), steps.package.outputs.result) }}
-         
-      - run: echo '${{ steps.version.env.VERSION }}'
+        run: | 
+          echo "The version is ${{ steps.package.outputs.result }}"
+          echo "The tag_name is ${{ github.event.release.tag_name }}"
           
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
