@@ -118,11 +118,10 @@ jobs:
           name: AutoInject-linux
           path: package
     
-      - name: Upload to Release
-        uses: svenstaro/upload-release-action@v2
+      - name: Release to Github
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
         with:
-          repo_name: ${{ format('{0}', github.repository) }}
-          file_glob: true
-          file: package/*
-          tag: ${{ needs.create-tag.outputs.release_tag }}
-          overwrite: true
+          body_path: CHANGELOG.md
+          files: |
+            package/*
