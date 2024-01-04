@@ -5,7 +5,7 @@
   extends: null,
   compression: 'maximum',
   copyright: 'ⓒ 2023 ${author}',
-  artifactName: '${productName} ${version}_${arch}.${ext}',
+  artifactName: '${productName}_${version}_${arch}.${ext}',
   directories: {
     buildResources: 'buildAssets',
     output: './release/${version}'
@@ -59,7 +59,7 @@
       },
       {
         target: 'zip',
-        arch: 'aarch64'
+        arch: 'arm64'
       },
       {
         target: 'nsis',
@@ -67,12 +67,8 @@
       },
       {
         target: 'nsis',
-        arch: 'x64'
-      },
-      {
-        target: 'nsis',
-        arch: 'aarch64'
-      },
+        arch: 'arm64'
+      }
     ]
   },
   portable: {
@@ -92,7 +88,7 @@
       },
       {
         target: 'deb',
-        arch: 'armv7l'
+        arch: 'arm64'
       },
       {
         target: 'AppImage',
@@ -100,8 +96,8 @@
       },
       {
         target: 'AppImage',
-        arch: 'armv7l'
-      },
+        arch: 'arm64'
+      }
     ]
   }
 }
