@@ -123,6 +123,6 @@ jobs:
         with:
           repo_name: ${{ format('{0}', github.repository) }}
           file_glob: true
-          file: package
+          file: package/*
           tag: ${{ needs.create-tag.outputs.release_tag }}
           overwrite: true
