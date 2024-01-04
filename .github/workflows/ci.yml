@@ -68,8 +68,8 @@ jobs:
 
       - name: Create package
         run: |
-          dir=${{ github.workspace }}/release
-          dest=${{ github.workspace }}/package
+          dir=./release
+          dest=./package
           mkdir "$dir"
           extensions=${{ matrix.suffix }}
           for ext in "${extensions[@]}"; do
