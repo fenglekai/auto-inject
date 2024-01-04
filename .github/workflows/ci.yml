@@ -1,6 +1,14 @@
 name: ci
 
-on: [push]
+on: 
+  push: 
+    tags:
+      - "v*"
+    paths:
+      - "src/**"
+      - "buildAssets/**"
+      - "electron-builder.json5"
+      - "!**/*.md"
 
 jobs:
   create-tag:
