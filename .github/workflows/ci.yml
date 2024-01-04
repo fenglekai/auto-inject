@@ -39,10 +39,10 @@ jobs:
         include:
           - os: ubuntu-latest
             build: "build:linux"
-            suffix: deb
+            suffix: (deb AppImage)
           - os: windows-latest
             build: "build:win"
-            suffix: exe
+            suffix: (exe zip)
         
     steps:
       - name: Checkout code
@@ -66,8 +66,16 @@ jobs:
           release: ${{ needs.create-tag.outputs.version }}
           build_script_name: ${{ matrix.build }}
 
-      - name: Check Build
-        run: ls ${{ github.workspace }}/release/${{ needs.create-tag.outputs.version }}
+      - name: Create package
+        run: |
+          dir=${{ github.workspace }}/release
+          dest=${{ github.workspace }}/package
+          mkdir "$dir"
+          extensions=${{ matrix.suffix }}
+          for ext in "${extensions[@]}"; do
+            find "$dir" -type f -name "*.$ext" exec cp {} "$dest" \;
+          done
+        shell: bash
 
       - name: Upload to Release
         uses: svenstaro/upload-release-action@v2
