@@ -9,6 +9,7 @@ on:
       - "buildAssets/**"
       - "electron-builder.json5"
       - "!**/*.md"
+      - ".github/workflows/ci.yml"
 
 jobs:
   create-tag:
@@ -38,7 +39,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       release_tag: ${{ steps.version.outputs.release_tag }}
     
-  eletron:
+  electron:
     needs: create-tag
     runs-on: ${{ matrix.os }}
 
@@ -74,22 +75,55 @@ jobs:
           release: ${{ needs.create-tag.outputs.version }}
           build_script_name: ${{ matrix.build }}
 
-      - name: Create package
-        run: |
-          dir=./release
-          dest=./package
-          mkdir "$dir"
-          extensions=${{ matrix.suffix }}
-          for ext in "${extensions[@]}"; do
-            find "$dir" -type f -name "*.$ext" exec cp {} "$dest" \;
-          done
-        shell: bash
+      - name: Check Build
+        run: ls release/${{ needs.create-tag.outputs.version }}/
 
+      - name: Upload artifact for windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoInject-win
+          path: 
+            release/${{ needs.create-tag.outputs.version }}/*.exe
+            release/${{ needs.create-tag.outputs.version }}/*.zip
+
+      - name: Upload artifact for linux
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoInject-linux
+          path: 
+            release/${{ needs.create-tag.outputs.version }}/*.deb
+            release/${{ needs.create-tag.outputs.version }}/*.AppImage
+            
+  release:
+    needs: [create-tag, electron]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+          ref: feature-1.2.0
+    
+      - name: Download artifact file for windows
+        uses: actions/download-artifact@v4
+        with:
+          name: AutoInject-win
+          path: package
+
+      - name: Download artifact file for linux
+        uses: actions/download-artifact@v4
+        with:
+          name: AutoInject-linux
+          path: package
+    
       - name: Upload to Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_name: ${{ format('{0}', github.repository) }}
           file_glob: true
-          file: release/${{ needs.create-tag.outputs.version }}/*.${{ matrix.suffix }}
+          file: package
           tag: ${{ needs.create-tag.outputs.release_tag }}
           overwrite: true
