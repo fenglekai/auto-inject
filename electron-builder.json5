@@ -5,7 +5,7 @@
   extends: null,
   compression: 'maximum',
   copyright: 'ⓒ 2023 ${author}',
-  artifactName: '${productName} ${version}_${arch}.${ext}',
+  artifactName: '${productName}_${version}_${arch}.${ext}',
   directories: {
     buildResources: 'buildAssets',
     output: './release/${version}'
@@ -55,11 +55,19 @@
     target: [
       {
         target: 'zip',
-        arch: ['x64', 'aarch64']
+        arch: 'x64'
+      },
+      {
+        target: 'zip',
+        arch: 'arm64'
       },
       {
         target: 'nsis',
-        arch: ['x64', 'aarch64']
+        arch: 'x64'
+      },
+      {
+        target: 'nsis',
+        arch: 'arm64'
       }
     ]
   },
@@ -76,12 +84,20 @@
     target: [
       {
         target: 'deb',
-        arch: ['x64', 'armv7l']
+        arch: 'x64'
+      },
+      {
+        target: 'deb',
+        arch: 'arm64'
       },
       {
         target: 'AppImage',
-        arch: ['x64', 'armv7l']
+        arch: 'x64'
       },
+      {
+        target: 'AppImage',
+        arch: 'arm64'
+      }
     ]
   }
 }
