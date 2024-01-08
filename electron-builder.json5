@@ -10,9 +10,11 @@
     buildResources: 'buildAssets',
     output: './release/${version}'
   },
-  publish: {
-    provider: 'spaces'
-  },
+  publish: [
+    {
+      provider: 'generic',
+    }
+  ],
   /* A list of files not to be included in the build. */
   files: [
     /*
