@@ -51,6 +51,9 @@ jobs:
             
           - os: windows-latest
             build: "build:win"
+
+          - os: macos-latest
+            build: "build:mac"
         
     steps:
       - name: Checkout code
@@ -66,7 +69,11 @@ jobs:
 
       - name: Check release tag
         run: echo "The release_tag is ${{ needs.create-tag.outputs.release_tag }}"
-          
+
+      - name: setup macos environment
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: npm install dmg-license
+
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with: 
@@ -94,6 +101,14 @@ jobs:
           path: |
             release/${{ needs.create-tag.outputs.version }}/*.deb
             release/${{ needs.create-tag.outputs.version }}/*.AppImage
+
+      - name: Upload artifact for macos
+        if: ${{ matrix.os == 'macos-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoInject-macos
+          path: |
+            release/${{ needs.create-tag.outputs.version }}/*.dmg
             
   release:
     needs: [create-tag, electron]
@@ -116,6 +131,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: AutoInject-linux
+          path: package
+
+      - name: Download artifact file for macos
+        uses: actions/download-artifact@v4
+        with:
+          name: AutoInject-macos
           path: package
     
       - name: Release to Github
