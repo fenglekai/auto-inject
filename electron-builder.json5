@@ -10,6 +10,9 @@
     buildResources: 'buildAssets',
     output: './release/${version}'
   },
+  updater: {
+    enabled: false
+  },
   /* A list of files not to be included in the build. */
   files: [
     /*
