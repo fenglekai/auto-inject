@@ -21,19 +21,19 @@ export default class IPCs {
     })
 
     ipcMain.on('windowMax', () => {
-      if(window.isMaximized()) {
-         window.restore()
-      }else{
+      if (window.isMaximized()) {
+        window.restore()
+      } else {
         window.maximize()
       }
     })
 
     ipcMain.on('windowMin', function () {
-        window.minimize();
+      window.minimize()
     })
 
     ipcMain.on('windowClose', function () {
-        window.close();
+      window.close()
     })
 
     ipcMain.handle('api:openServer', init)

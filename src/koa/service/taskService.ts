@@ -185,7 +185,11 @@ export class TaskProcess {
                   return reject(Error('任务已终止'))
                 }
                 try {
-                  const data = await this.modbusClient[i].readRegisters(method, Number(readAddress), 1)
+                  const data = await this.modbusClient[i].readRegisters(
+                    method,
+                    Number(readAddress),
+                    1
+                  )
                   const currentValue = data.response.body.valuesAsArray[0]
                   currentTask.data[i].watchValue = currentValue
                   // 判断等待重置状态

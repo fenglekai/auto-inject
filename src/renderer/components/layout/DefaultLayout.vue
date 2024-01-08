@@ -5,7 +5,7 @@
     <v-layout full-height>
       <HeaderLayout />
       <AsideLayout />
-      <v-main style="max-height: 100vh; overflow-y: scroll;">
+      <v-main style="max-height: 100vh; overflow-y: scroll">
         <slot />
       </v-main>
     </v-layout>

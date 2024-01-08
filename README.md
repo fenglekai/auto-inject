@@ -50,17 +50,16 @@ ModbusTCP 可视化图形界面连接工具。提供读写操作 api 接口；�
 
 - linux
 - node 16.16.0
-- pnpm
 
 ```
-pnpm install
-pnpm dev
+npm install
+npm dev
 ```
 
 ### Koa 后台单独启动
 
 ```
-pnpm dev:server
+npm dev:server
 ```
 
 ## 构建方式
@@ -68,15 +67,15 @@ pnpm dev:server
 ### 客户端构建
 
 ```
-pnpm build:win
-pnpm build:linux
+npm build:win
+npm build:linux
 ```
 
 ### pkg 构建
 
 ```
-pnpm pkg:win
-pnpm pkg:linux
+npm pkg:win
+npm pkg:linux
 ```
 
 ### 下载编译环境问题
