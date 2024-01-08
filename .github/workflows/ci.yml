@@ -78,7 +78,7 @@ jobs:
         uses: samuelmeuli/action-electron-builder@v1.6.0
         with: 
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: ${{ needs.create-tag.outputs.release_tag }}
+          # release: ${{ needs.create-tag.outputs.version }}
           build_script_name: ${{ matrix.build }}
 
       - name: Check Build
