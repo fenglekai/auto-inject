@@ -75,11 +75,9 @@ jobs:
         run: npm install dmg-license
 
       - name: Build
-        uses: samuelmeuli/action-electron-builder@v1.6.0
-        with: 
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          # release: ${{ needs.create-tag.outputs.version }}
-          build_script_name: ${{ matrix.build }}
+        run: |
+          npm install
+          npm run ${{ matrix.build }}
 
       - name: Check Build
         run: ls release/${{ needs.create-tag.outputs.version }}/
