@@ -11,7 +11,7 @@
     output: './release/${version}'
   },
   publish: {
-    provider: 'generic'
+    provider: 'spaces'
   },
   /* A list of files not to be included in the build. */
   files: [
