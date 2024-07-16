@@ -1,4 +1,4 @@
-# 任务API
+# 任务 API
 
 ## taskName
 
@@ -12,7 +12,7 @@
 
 **类型：Array**
 
-### type 
+### type
 
 任务类型
 
@@ -29,8 +29,8 @@
 
 **描述：**
 
-- readModbus: 监听 modbus 值状态 
-- request: 调用接口（POST、GET） 
+- readModbus: 监听 modbus 值状态
+- request: 调用接口（POST、GET）
 - writeModbus: 写入 modbus 值
 - MongoDBOperation: mongoDB 操作
 - waitApi: 等待接口调用
@@ -46,9 +46,9 @@
 
 **描述：**
 
-- 0: 未执行 
-- 1: 执行中 
-- 2: 执行成功 
+- 0: 未执行
+- 1: 执行中
+- 2: 执行成功
 - 3: 执行失败
 
 ### data
@@ -107,8 +107,6 @@ export interface DBParams {
 }
 ```
 
-
-
 ### resultData
 
 任务返回
@@ -125,156 +123,145 @@ export interface DBParams {
 
 **描述：**
 
-- 0: 未执行 
-- 1: 执行中 
-- 2: 执行成功 
+- 0: 未执行
+- 1: 执行中
+- 2: 执行成功
 - 3: 执行失败
-
-
 
 ## 示例
 
 ```json
 {
-    "taskName": "Task_17",
-    "taskList": [
+  "taskName": "Task_17",
+  "taskList": [
+    {
+      "type": "readModbus",
+      "status": 0,
+      "data": [
         {
-            "type": "readModbus",
-            "status": 0,
-            "data": [
-                {
-                    "ip": "localhost",
-                    "port": "8888",
-                    "readAddress": "5",
-                    "readValue": "0",
-                    "watchValue": null,
-                    "method": "readCoils"
-                }
-            ],
-            "resultData": true
-        },
-        {
-            "type": "request",
-            "status": 0,
-            "data": {
-                "method": "GET",
-                "url": "http://localhost:3000/test",
-                "data": [
-                    {
-                        "name": "taskID",
-                        "value": "00001"
-                    },
-                    {
-                        "name": "vehicle",
-                        "value": "1"
-                    }
-                ],
-                "useResponse": false,
-                "beforeResponse": {}
-            },
-            "resultData": {
-                "taskID": "00001",
-                "vehicle": "1"
-            }
-        },
-        {
-            "type": "MongoDBOperation",
-            "status": 0,
-            "data": {
-                "url": "localhost:27017",
-                "method": "findDB",
-                "DBName": "auto_inject",
-                "tabName": "vehicle_tray",
-                "data": {
-                    "status": 0
-                },
-                "setData": {},
-                "useResponse": true,
-                "beforeResponse": {
-                    "data": {
-                        "vehicle": {
-                            "step": 1,
-                            "selected": [
-                                "vehicle"
-                            ]
-                        }
-                    },
-                    "setData": {}
-                }
-            },
-            "resultData": []
-        },
-        {
-            "type": "request",
-            "status": 0,
-            "data": {
-                "method": "POST",
-                "url": "http://localhost:3000/test",
-                "data": "{}",
-                "useResponse": true,
-                "beforeResponse": {
-                    "taskID": {
-                        "step": 1,
-                        "selected": [
-                            "taskID"
-                        ]
-                    },
-                    "position": {
-                        "step": 2,
-                        "selected": [
-                            "0->vehicle",
-                            "0->location",
-                            "0->point"
-                        ]
-                    }
-                }
-            },
-            "resultData": {
-                "taskID": "00001",
-                "position": "undefinedundefinedundefined"
-            }
-        },
-        {
-            "type": "waitApi",
-            "status": 0,
-            "data": {},
-            "resultData": true
-        },
-        {
-            "type": "readModbus",
-            "status": 0,
-            "data": [
-                {
-                    "ip": "localhost",
-                    "port": "8888",
-                    "readAddress": "10",
-                    "readValue": "0",
-                    "watchValue": null,
-                    "method": "readCoils"
-                }
-            ],
-            "resultData": true
-        },
-        {
-            "type": "writeModbus",
-            "status": 0,
-            "data": {
-                "ip": "localhost",
-                "port": "8888",
-                "writeAddress": "20",
-                "writeValue": "1",
-                "method": "writeSingleCoil"
-            },
-            "resultData": true
-        },
-        {
-            "type": "apiCallback",
-            "status": 0,
-            "data": {},
-            "resultData": true
+          "ip": "localhost",
+          "port": "8888",
+          "readAddress": "5",
+          "readValue": "0",
+          "watchValue": null,
+          "method": "readCoils"
         }
-    ],
-    "taskStatus": 0
+      ],
+      "resultData": true
+    },
+    {
+      "type": "request",
+      "status": 0,
+      "data": {
+        "method": "GET",
+        "url": "http://localhost:3000/test",
+        "data": [
+          {
+            "name": "taskID",
+            "value": "00001"
+          },
+          {
+            "name": "vehicle",
+            "value": "1"
+          }
+        ],
+        "useResponse": false,
+        "beforeResponse": {}
+      },
+      "resultData": {
+        "taskID": "00001",
+        "vehicle": "1"
+      }
+    },
+    {
+      "type": "MongoDBOperation",
+      "status": 0,
+      "data": {
+        "url": "localhost:27017",
+        "method": "findDB",
+        "DBName": "auto_inject",
+        "tabName": "vehicle_tray",
+        "data": {
+          "status": 0
+        },
+        "setData": {},
+        "useResponse": true,
+        "beforeResponse": {
+          "data": {
+            "vehicle": {
+              "step": 1,
+              "selected": ["vehicle"]
+            }
+          },
+          "setData": {}
+        }
+      },
+      "resultData": []
+    },
+    {
+      "type": "request",
+      "status": 0,
+      "data": {
+        "method": "POST",
+        "url": "http://localhost:3000/test",
+        "data": "{}",
+        "useResponse": true,
+        "beforeResponse": {
+          "taskID": {
+            "step": 1,
+            "selected": ["taskID"]
+          },
+          "position": {
+            "step": 2,
+            "selected": ["0->vehicle", "0->location", "0->point"]
+          }
+        }
+      },
+      "resultData": {
+        "taskID": "00001",
+        "position": "undefinedundefinedundefined"
+      }
+    },
+    {
+      "type": "waitApi",
+      "status": 0,
+      "data": {},
+      "resultData": true
+    },
+    {
+      "type": "readModbus",
+      "status": 0,
+      "data": [
+        {
+          "ip": "localhost",
+          "port": "8888",
+          "readAddress": "10",
+          "readValue": "0",
+          "watchValue": null,
+          "method": "readCoils"
+        }
+      ],
+      "resultData": true
+    },
+    {
+      "type": "writeModbus",
+      "status": 0,
+      "data": {
+        "ip": "localhost",
+        "port": "8888",
+        "writeAddress": "20",
+        "writeValue": "1",
+        "method": "writeSingleCoil"
+      },
+      "resultData": true
+    },
+    {
+      "type": "apiCallback",
+      "status": 0,
+      "data": {},
+      "resultData": true
+    }
+  ],
+  "taskStatus": 0
 }
 ```
-

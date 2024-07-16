@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           show-progress: false
-          ref: startsWith(github.ref, 'refs/tags/')
+          ref: ${{ github.ref_name }}
 
       - name: Get version
         id: package
@@ -51,13 +51,16 @@ jobs:
             
           - os: windows-latest
             build: "build:win"
+
+          - os: macos-latest
+            build: "build:mac"
         
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           show-progress: false
-          ref: startsWith(github.ref, 'refs/tags/')
+          ref: ${{ github.ref_name }}
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
@@ -66,13 +69,15 @@ jobs:
 
       - name: Check release tag
         run: echo "The release_tag is ${{ needs.create-tag.outputs.release_tag }}"
-          
+
+      - name: setup macos environment
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: npm install dmg-license
+
       - name: Build
-        uses: samuelmeuli/action-electron-builder@v1.6.0
-        with: 
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: ${{ needs.create-tag.outputs.version }}
-          build_script_name: ${{ matrix.build }}
+        run: |
+          npm install
+          npm run ${{ matrix.build }}
 
       - name: Check Build
         run: ls release/${{ needs.create-tag.outputs.version }}/
@@ -94,6 +99,14 @@ jobs:
           path: |
             release/${{ needs.create-tag.outputs.version }}/*.deb
             release/${{ needs.create-tag.outputs.version }}/*.AppImage
+
+      - name: Upload artifact for macos
+        if: ${{ matrix.os == 'macos-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoInject-macos
+          path: |
+            release/${{ needs.create-tag.outputs.version }}/*.dmg
             
   release:
     needs: [create-tag, electron]
@@ -104,7 +117,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           show-progress: false
-          ref: startsWith(github.ref, 'refs/tags/')
+          ref: ${{ github.ref_name }}
     
       - name: Download artifact file for windows
         uses: actions/download-artifact@v4
@@ -117,12 +130,17 @@ jobs:
         with:
           name: AutoInject-linux
           path: package
-    
-      - name: Upload to Release
-        uses: svenstaro/upload-release-action@v2
+
+      - name: Download artifact file for macos
+        uses: actions/download-artifact@v4
         with:
-          repo_name: ${{ format('{0}', github.repository) }}
-          file_glob: true
-          file: package/*
-          tag: ${{ needs.create-tag.outputs.release_tag }}
-          overwrite: true
+          name: AutoInject-macos
+          path: package
+    
+      - name: Release to Github
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: CHANGELOG.md
+          files: |
+            package/*
